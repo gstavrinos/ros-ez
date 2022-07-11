@@ -1,0 +1,19 @@
+#!/bin/bash
+gpu_string=$(lspci | grep VGA)
+gpu_param=""
+if grep -q "nvidia" <<< "$gpu_string" || grep -q "Nvidia" <<< "$gpu_string" || grep -q "NVIDIA" <<< "$gpu_string"
+then
+    gpu_param="--nvidia"
+elif grep -q "intel" <<< "$gpu_string" || grep -q "Intel" <<< "$gpu_string" || grep -q "INTEL" <<< "$gpu_string"
+then
+    gpu_param="--device /dev/dri/card0"
+else
+    echo "No Nvidia or Intel GPU found. This case has not been investigated yet. GUI integration might be broken. (Good luck!)"
+fi
+echo $gpu_param
+if [ $# -gt 0 ]
+then
+    sudo rocker --mode interactive --x11 $gpu_param --volume /home/$USER/ros2_ws/:/opt/ros/ros2_ws entrypoint.bash:/root/.bashrc -- ros2_ez:latest "/bin/bash -c \"source /root/.bashrc && $*\""
+else
+    sudo rocker --mode interactive --x11 $gpu_param --volume /home/$USER/ros2_ws/:/opt/ros/ros2_ws entrypoint.bash:/root/.bashrc -- ros2_ez:latest "env $ENV /bin/bash"
+fi
