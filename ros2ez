@@ -1,7 +1,11 @@
 #!/bin/bash
 gpu_string=$(lspci | grep VGA)
 gpu_param=""
-if grep -q "nvidia" <<< "$gpu_string" || grep -q "Nvidia" <<< "$gpu_string" || grep -q "NVIDIA" <<< "$gpu_string"
+if grep -q "force-integrated" <<< "$1" || grep -q "fi" <<< "$1"
+then
+    gpu_param="--device /dev/dri/card0"
+    shift
+elif grep -q "nvidia" <<< "$gpu_string" || grep -q "Nvidia" <<< "$gpu_string" || grep -q "NVIDIA" <<< "$gpu_string"
 then
     gpu_param="--nvidia"
 elif grep -q "intel" <<< "$gpu_string" || grep -q "Intel" <<< "$gpu_string" || grep -q "INTEL" <<< "$gpu_string"
