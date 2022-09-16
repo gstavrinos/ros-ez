@@ -18,7 +18,7 @@ echo $gpu_param
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 if [ $# -gt 0 ]
 then
-    sudo rocker --mode interactive --x11 $gpu_param --volume /home/$USER/ros2_ws/:/opt/ros/ros2_ws $SCRIPT_DIR/entrypoint.bash:/root/.bashrc -- ros2_ez:latest "/bin/bash -c \"source /root/.bashrc && $*\""
+    sudo rocker --mode interactive --x11 $gpu_param --volume /home/$USER/ros2_ws/:/opt/ros/ros2_ws $SCRIPT_DIR/../includes/ros2_entrypoint.bash:/root/.bashrc -- ros2_ez:latest "/bin/bash -c \"source /root/.bashrc && $*\""
 else
-    sudo rocker --mode interactive --x11 $gpu_param --volume /home/$USER/ros2_ws/:/opt/ros/ros2_ws $SCRIPT_DIR/entrypoint.bash:/root/.bashrc -- ros2_ez:latest "env $ENV /bin/bash"
+    sudo rocker --mode interactive --x11 $gpu_param --volume /home/$USER/ros2_ws/:/opt/ros/ros2_ws $SCRIPT_DIR/../includes/ros2_entrypoint.bash:/root/.bashrc -- ros2_ez:latest "env $ENV /bin/bash"
 fi
