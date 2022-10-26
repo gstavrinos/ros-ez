@@ -21,3 +21,5 @@ ros-noetic-position-controllers \
 ros-noetic-joint-state-publisher \
 ros-noetic-transmission-interface \
 ros-noetic-joint-state-publisher-gui
+
+VOLUME /opt/ros/noetic
