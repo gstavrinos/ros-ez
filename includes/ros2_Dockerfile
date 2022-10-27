@@ -23,3 +23,5 @@ ros-humble-position-controllers \
 ros-humble-joint-state-publisher \
 ros-humble-transmission-interface \
 ros-humble-joint-state-publisher-gui
+
+VOLUME /opt/ros/humble
