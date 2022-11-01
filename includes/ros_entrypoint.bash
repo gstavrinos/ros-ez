@@ -3,5 +3,5 @@
 cd /opt/ros/catkin_ws
 rosdep install -i --from-path src --rosdistro noetic -y
 catkin_make
-. /opt/ros/catkin_ws/install/setup.bash
+. /opt/ros/catkin_ws/devel/setup.bash
 exec "$@"
