@@ -1,5 +1,6 @@
 #!/bin/bash
-sudo pip install rocker
+sudo pip install rocker==0.2.10
+sudo docker volume create rosez-volume
 sudo docker build --no-cache --pull -t ros_ez -f includes/ros_Dockerfile .
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )'/ros-ez'
 string_for_bashrc='export PATH="$PATH:'$SCRIPT_DIR'"'
