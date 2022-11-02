@@ -35,5 +35,3 @@ or
 
 ## TODOs
 * Make workspaces customizable (not just `ros2_ws`/`catkin_ws`).
-* Make adding dependencies in the docker images easier.
-
