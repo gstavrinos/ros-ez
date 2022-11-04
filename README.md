@@ -7,7 +7,7 @@ Docker 'n' rocker for quick and easy access to ROS2 (humble) and ROS1 (noetic) a
 * `pip`
 * `rocker` (automatically installed using pip in the installer script)
 * `Linux` (not necessarily Debian-based)
-* A `ros2_ws` directory located at `$HOME` for the ROS2 workspace
+* A `ros2_ws` directory located at `$HOME` for the ROS2 workspace.
 * A `catkin_ws` directory located at `$HOME` for the ROS1 workspace
 
 ## Instructions
@@ -26,6 +26,7 @@ or
 
 #### Tips!
 * If you encounter errors regarding your graphics card while trying to run the `rosez` or `ros2ez` script, try adding the `fi` or `force-integrated` flag, which will force usage of the integrated graphics card of your computer. This is, of course, not optimal, so update your drivers and try running the script again. Make sure that the flag is the first argument of your command. If this fails too, open an issue. For instance, the examples above can be executed with the integrated graphics card by running `ros2ez fi ros2 run teleop_twist_keyboard teleop_twist_keyboard cmd_vel:=racer_01/cmd_vel` and `rosez fi rosrun rviz rviz` respectively.
+* You can change or add default workspaces by editing the `includes/ros*_ws.txt` file. One directory per line.
 
 ## Tested platforms
 * EndeavourOS
@@ -33,5 +34,3 @@ or
 * Ubuntu 22.04
 * MX Linux 19.1
 
-## TODOs
-* Make workspaces customizable (not just `ros2_ws`/`catkin_ws`).
