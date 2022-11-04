@@ -16,7 +16,15 @@ else
 fi
 echo $gpu_param
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-x="sudo "$(sudo rocker --mode dry-run --network host --x11 $gpu_param --volume rosez-volume:/opt/ros/noetic/ --volume /home/$USER/catkin_ws/:/opt/ros/catkin_ws $SCRIPT_DIR/../includes/ros_entrypoint.bash:/root/.bashrc -- ros_ez:latest | tail -n 1 | sed -e 's/-v .*rosez-volume:/-v rosez-volume:/')
+volumes=""
+cwd=$(pwd)
+while read -r line
+do
+    wsdir=$(eval echo -e "$line")
+    volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
+done < $SCRIPT_DIR/../includes/ros_ws.txt
+cd $cwd
+x="sudo "$(sudo rocker --mode dry-run --network host --x11 $gpu_param --volume rosez-volume:/opt/ros/noetic/ --volume $SCRIPT_DIR/../includes/ros_ws.txt:/opt/ros/ros_ws.txt $volumes $SCRIPT_DIR/../includes/ros_entrypoint.bash:/root/.bashrc -- ros_ez:latest | tail -n 1 | sed -e 's/-v .*rosez-volume:/-v rosez-volume:/')
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
 touch $xauthf
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
@@ -25,6 +33,6 @@ if [ $# -gt 0 ]
 then
     extras=$extras" -c \"source /root/.bashrc && $* \""
 fi
-x="sudo ${x} ${extras}"
+x="${x} ${extras}"
 printf "Executing:\n---\n$x\n---\n"
 eval "$x"
