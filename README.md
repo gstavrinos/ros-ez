@@ -7,8 +7,6 @@ Docker 'n' rocker for quick and easy access to ROS2 (humble) and ROS1 (noetic) a
 * `pip`
 * `rocker` (automatically installed using pip in the installer script)
 * `Linux` (not necessarily Debian-based)
-* A `ros2_ws` directory located at `$HOME` for the ROS2 workspace.
-* A `catkin_ws` directory located at `$HOME` for the ROS1 workspace
 
 ## Instructions
 * Make sure your system satisfies all the requirements. The installer script tries to remain distro-agnostic, thus does not install anything apart from `rocker` through `pip`).
