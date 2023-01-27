@@ -12,4 +12,5 @@ do
     colcon build --symlink-install
     . /opt/ros/$bl/install/setup.bash
 done < /opt/ros/ros2_ws.txt
+. /usr/share/gazebo/setup.bash
 exec "$@"

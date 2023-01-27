@@ -11,4 +11,5 @@ do
     catkin_make
     . /opt/ros/$bl/devel/setup.bash
 done < /opt/ros/ros_ws.txt
+. /usr/share/gazebo/setup.bash
 exec "$@"
