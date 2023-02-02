@@ -32,3 +32,6 @@ or
 * Ubuntu 22.04
 * MX Linux 19.1
 
+## Roadmap
+* Run the ros*\*ez image as the current user and not root (this will solve permission issues)
+* Merge the ros\*_entrypoint.bash files and check inside which commands are needed for each ROS distribution.

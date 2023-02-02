@@ -1,8 +1,7 @@
-FROM osrf/ros:humble-desktop-full
-
-LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
 RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y && apt-get install -y \
+gdb \
+valgrind \
 ros-humble-gazebo-ros \
 ros-humble-navigation2 \
 ros-humble-nav2-bringup \
