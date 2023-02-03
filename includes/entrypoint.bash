@@ -15,7 +15,6 @@ if [ "$rosversion" != "unknown" ]; then
     while read -r line
     do
         bl="$(basename $line)"
-        wstxt="ros2_ws.txt"
         cd /opt/ros/$bl
         if rosdep check -i --from-path src --rosdistro $rosversion -y | grep -q 'System dependencies have not been satisfied'; then
             apt update
