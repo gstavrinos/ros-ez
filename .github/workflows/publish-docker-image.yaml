@@ -30,7 +30,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: "./includes/ros_Dockerfile"
+          file: "./internal/ros_Dockerfile"
           push: true
           tags: gstavrinos/rosez:latest
       -
@@ -38,6 +38,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: "./includes/ros2_Dockerfile"
+          file: "./internal/ros2_Dockerfile"
           push: true
           tags: gstavrinos/ros2ez:latest
