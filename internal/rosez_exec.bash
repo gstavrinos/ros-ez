@@ -1,4 +1,15 @@
 #!/bin/bash
+rosws_file="ros2_ws.txt"
+rosez_vol="ros2ez-volume"
+ros="humble"
+ros_image="ros2_ez"
+if [ "$1" == "1" ]; then
+    rosws_file="ros_ws.txt"
+    rosez_vol="rosez-volume"
+    ros="noetic"
+    ros_image="ros_ez"
+fi
+shift
 gpu_string=$(lspci | grep VGA)
 gpu_param=""
 if grep -q "force-integrated" <<< "$1" || grep -q "fi" <<< "$1"
@@ -22,17 +33,20 @@ while read -r line
 do
     wsdir=$(eval echo -e "$line")
     volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
-done < $SCRIPT_DIR/../includes/ros_ws.txt
+done < $SCRIPT_DIR/../includes/$rosws_file
 cd $cwd
-x="sudo "$(sudo rocker --mode dry-run --user --network host --x11 $gpu_param --volume rosez-volume:/opt/ros/noetic/ --volume $SCRIPT_DIR/../includes/ros_ws.txt:/opt/ros/ros_ws.txt $volumes $SCRIPT_DIR/../includes/entrypoint.bash:/root/.bashrc -- ros_ez:latest | tail -n 1 | sed -e 's/-v .*rosez-volume:/-v rosez-volume:/')
+x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
 touch $xauthf
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
 extras="env $ENV /bin/bash"
 if [ $# -gt 0 ]
 then
-    extras=$extras" -c \"source /root/.bashrc && $* \""
+    extras=$extras" -c \"source /home/rosez_user/.bashrc && $* \""
 fi
 x="${x} ${extras}"
+userid=$(id -u)
+groupid=$(id -g)
+x=${x/docker run --rm -it/docker run --rm -it -u $userid:$groupid --ipc=host}
 printf "Executing:\n---\n$x\n---\n"
 eval "$x"

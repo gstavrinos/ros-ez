@@ -4,6 +4,7 @@ LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
 RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y && apt-get install -y \
 gdb \
+xterm \
 valgrind \
 ros-noetic-amcl \
 ros-noetic-moveit \
@@ -23,5 +24,13 @@ ros-noetic-position-controllers \
 ros-noetic-joint-state-publisher \
 ros-noetic-transmission-interface \
 ros-noetic-joint-state-publisher-gui
+
+ARG USER_ID=16661
+ARG GROUP_ID=16661
+
+RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+USER rosez_user
+RUN rosdep update
 
 VOLUME /opt/ros/noetic

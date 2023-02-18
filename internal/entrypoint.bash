@@ -17,11 +17,11 @@ if [ "$rosversion" != "unknown" ]; then
         bl="$(basename $line)"
         cd /opt/ros/$bl
         if rosdep check -i --from-path src --rosdistro $rosversion -y | grep -q 'System dependencies have not been satisfied'; then
-            apt update
+            sudo apt update
         fi
         rosdep install -i --from-path src --rosdistro $rosversion -y
         if [ "$rosversion" == "humble" ]; then
-            colcon build --symlink-install
+            colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
             . /opt/ros/$bl/install/setup.bash
         else
             catkin_make
