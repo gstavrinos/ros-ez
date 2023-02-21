@@ -1,4 +1,5 @@
-# ros-ez
+<img src=media/rosez.png width="444px"/>
+
 Docker 'n' rocker for quick and easy access to ROS2 (humble) and ROS1 (noetic) along with their GUI applications like Gazebo and rViz without the need for a local installation
 
 ## Requirements
