@@ -11,7 +11,6 @@ lock_file="$lock_prefix$now$lock_suffix"
 rosversion="unknown"
 lockation=""
 wstxt="ros2_ws.txt"
-sudo rm -f /opt/ros/humble/*.lock
 if [ -f /opt/ros/humble/setup.bash ]; then
     rosversion="humble"
 elif [ -f /opt/ros/noetic/setup.bash ]; then
@@ -19,6 +18,10 @@ elif [ -f /opt/ros/noetic/setup.bash ]; then
     wstxt="ros_ws.txt"
 fi
 lockation="/opt/ros/$rosversion"
+if [ "$ROSEZCLEARLOCKS" == "ros-ez-CL" ]; then
+    sudo rm -f $lockation/$lock_prefix*$lock_suffix
+    shift
+fi
 function handler() {
     echo lalala
     sudo rm -f $lockation/$lock_file
