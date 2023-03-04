@@ -17,7 +17,7 @@ gpu_param=""
 clear_locks=0
 # I am not using the index here,
 # but I make sure that I cycle through
-# the (at most) the first i parameters
+# the (at most) first i parameters
 # to catch all the flags
 for i in "${!known_params[@]}"; do
     if [ "${known_params[0]}" == "$1" ] || [ "${known_params_short[0]}" == "$1" ]; then

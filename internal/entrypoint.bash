@@ -1,4 +1,9 @@
 #!/bin/bash
+colour_end='\033[0m'
+colour_red='\033[0;31m'
+colour_green='\033[0;32m'
+colour_orange='\033[0;33m'
+colour_blue='\033[0;34m'
 lock_prefix=".rosez-"
 lock_suffix=".lock"
 now="$(date +'%Y-%m-%d_%H_%M_%S_%N')"
@@ -19,15 +24,28 @@ elif [ -f /opt/ros/noetic/setup.bash ]; then
 fi
 lockation="/opt/ros/$rosversion"
 if [ "$ROSEZCLEARLOCKS" == "ros-ez-CL" ]; then
+    echo -e "${colour_orange}I was passed the clear-locks flag. Deleting all lock files...$colour_end"
     sudo rm -f $lockation/$lock_prefix*$lock_suffix
     shift
 fi
-function handler() {
-    echo lalala
+# This function is used to trap signals
+function signal_handler() {
+    echo -e "${colour_red}Execution was aborted, deleting my lock_file ($lock_file)$colour_end"
     sudo rm -f $lockation/$lock_file
     exit
 }
-trap 'handler' INT QUIT TSTP TERM HUP KILL
+# This function is used to check intermediate commands'
+# exit codes and then terminate if there was an error
+function intermediate_error_handler() {
+    # TODO failed and aborted commands report the same
+    # exit code. Good luck!
+    echo $1
+    if [ $1 -gt 0 ]; then
+        echo -e "${colour_red}Intermediate process aborted!$colour_end"
+        signal_handler
+    fi
+}
+trap 'signal_handler' INT QUIT TSTP TERM HUP KILL
 if [ "$rosversion" != "unknown" ]; then
     sudo touch $lockation/$lock_file
     . /opt/ros/$rosversion/setup.bash
@@ -37,16 +55,28 @@ if [ "$rosversion" != "unknown" ]; then
     locked=1
     while [ $locked -gt 0 ]; do
         found_lock="$(find $lockation -maxdepth 1 -name "$lock_prefix*$lock_suffix" -print | sort | head -1)"
+        # The found_lock should be empty only
+        # in the (rare?) case of enabling the 
+        # clear-locks (cl) flag from another rosez process
+        # ---
+        # A new lock_file is created, since the other rosez
+        # process will instantly get priority with the cl flag.
+        if [ -z "$found_lock" ]; then
+            now="$(date +'%Y-%m-%d_%H_%M_%S_%N')"
+            lock_file="$lock_prefix$now$lock_suffix"
+            sudo touch $lockation/$lock_file
+            found_lock=$lockation/$lock_file
+        fi
         fl="$(basename $found_lock)"
+        echo -e "${colour_blue}Processing: $fl$colour_end"
         if [ "$fl" \< "$earliest_possible_lock_file" ]; then
-            echo found problematic lock file. deleting it
+            echo -e "${colour_orange}Found problematic lock file ($fl)! Deleting it... (Lock file older than uptime)$colour_end"
             sudo rm $found_lock
         elif [ "$fl" \< "$lock_file" ]; then
-            echo found earlier lock
-            echo found rosez lock waiting...
+            echo -e "${colour_orange}Found earlier lock file ($fl) than my own ($lock_file)!\nWaiting...$colour_end"
             sleep 3
         elif [ "$fl" == "$lock_file" ]; then
-            echo unlocking...
+            echo -e "${colour_green}My lock file ($lock_file) is the earliest found. Continuing...$colour_end"
             locked=0
         fi
     done
@@ -55,22 +85,31 @@ if [ "$rosversion" != "unknown" ]; then
             bl="$(basename $line)"
             cd /opt/ros/$bl
             if rosdep check -i --from-path src --rosdistro $rosversion -y | grep -q 'System dependencies have not been satisfied'; then
+                intermediate_error_handler $?
                 sudo apt update
+                intermediate_error_handler $?
             fi
             rosdep install -i --from-path src --rosdistro $rosversion -y
+            intermediate_error_handler $?
             if [ "$rosversion" == "humble" ]; then
                 colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo
+                intermediate_error_handler $?
                 . /opt/ros/$bl/install/setup.bash
+                intermediate_error_handler $?
             else
                 catkin_make
+                intermediate_error_handler $?
                 . /opt/ros/$bl/devel/setup.bash
+                intermediate_error_handler $?
             fi
         done < /opt/ros/$wstxt
         . /usr/share/gazebo/setup.bash
+        intermediate_error_handler $?
+        echo -e "${colour_green}Unlocking my lock file ($lock_file) for other processes...$colour_end"
         sudo rm $lockation/$lock_file
         exec "$@"
     else
-        echo Encountered a very weird error. Exiting...
+        echo -e "${colour_red}Encountered a very weird error. We shouldn't have come here... Exiting...$colour_end"
         sudo rm $lockation/$lock_file
         exit
     fi
