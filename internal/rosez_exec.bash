@@ -18,7 +18,6 @@ clear_locks=0
 bloom_file=/home/$USER/.config/bloom
 gitconfig_file=/home/$USER/.gitconfig
 ssh_folder=/home/$USER/.ssh
-# gpg_keys_folder=/home/$USER/.gnupg
 if [ ! -f  $bloom_file ]; then
     touch $bloom_file
 fi
@@ -65,7 +64,6 @@ do
     volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
 done < $SCRIPT_DIR/../includes/$rosws_file
 cd $cwd
-# x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc $bloom_file:/home/rosez_user/.config/bloom $gitconfig_file:/home/rosez_user/.gitconfig $ssh_folder:/home/rosez_user/.ssh $gpg_keys_folder:/home/rosez_user/.gnupg $bloom_file:$bloom_file $gitconfig_file:$gitconfig_file $ssh_folder:$ssh_folder $gpg_keys_folder:$gpg_keys_folder -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
 x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc $bloom_file:/home/rosez_user/.config/bloom $gitconfig_file:/home/rosez_user/.gitconfig $ssh_folder:/home/rosez_user/.ssh $bloom_file:$bloom_file $gitconfig_file:$gitconfig_file $ssh_folder:$ssh_folder -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
 touch $xauthf
