@@ -28,9 +28,7 @@ fi
 if [ ! -d  $ssh_folder ]; then
     mkdir $ssh_folder
 fi
-# if [ ! -d  $gpg_keys_folder ]; then
-    # mkdir $gpg_keys_folder
-# fi
+
 # I am not using the index here,
 # but I make sure that I cycle through
 # the (at most) first i parameters
