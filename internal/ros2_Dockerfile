@@ -6,6 +6,8 @@ RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y &
 gdb \
 xterm \
 valgrind \
+python3-bloom \
+python3-catkin-pkg \
 ros-humble-gazebo-ros \
 ros-humble-navigation2 \
 ros-humble-nav2-bringup \
