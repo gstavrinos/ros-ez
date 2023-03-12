@@ -30,7 +30,7 @@ ros-noetic-joint-state-publisher-gui
 ARG USER_ID=16661
 ARG GROUP_ID=16661
 
-RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
 
 USER rosez_user
 RUN rosdep update

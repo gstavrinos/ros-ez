@@ -79,6 +79,6 @@ fi
 x="$x $extras"
 userid=$(id -u)
 groupid=$(id -g)
-x=${x/docker run --rm -it/docker run --rm -it -u $userid:$groupid --ipc=host}
+x=${x/docker run --rm -it/docker run --rm -it -u $userid --ipc=host}
 printf "Executing:\n---\n$x\n---\n"
 eval "$x"
