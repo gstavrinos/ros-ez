@@ -64,7 +64,7 @@ do
     volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
 done < $SCRIPT_DIR/../includes/$rosws_file
 cd $cwd
-x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc $bloom_file:/home/rosez_user/.config/bloom $gitconfig_file:/home/rosez_user/.gitconfig $ssh_folder:/home/rosez_user/.ssh $bloom_file:$bloom_file $gitconfig_file:$gitconfig_file $ssh_folder:$ssh_folder -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
+x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc $bloom_file:/home/rosez_user/.config/bloom $gitconfig_file:/home/rosez_user/.gitconfig $ssh_folder:/home/rosez_user/.ssh -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
 touch $xauthf
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
