@@ -13,6 +13,12 @@ if [ "$1" == "1" ]; then
 fi
 sudo pip install rocker==0.2.10
 cd $SCRIPT_DIR
+need_rr=0
+if ! id -nGz "$USER" | grep -qzxF "docker"
+then
+    sudo usermod -aG docker $USER
+    need_rr=1
+fi
 sudo docker volume create $volume
 sudo docker build --no-cache --pull -t $image_name -f $SCRIPT_DIR/$dockerfile . --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)
 string_for_bashrc='export PATH="$PATH:'$SCRIPT_DIR/"${executable_folder_name}"'"'
@@ -20,5 +26,10 @@ string_for_bashrc='export PATH="$PATH:'$SCRIPT_DIR/"${executable_folder_name}"'"
 if ! $( grep -Fx "$string_for_bashrc" ~/.bashrc )
 then
     echo $string_for_bashrc >> ~/.bashrc
+    . ~/.bashrc
+fi
+if [[ $need_rr -gt 0 ]]
+then
+    echo "Please reboot your system, and then try using ros-ez!"
 fi
 cd $original_dir
