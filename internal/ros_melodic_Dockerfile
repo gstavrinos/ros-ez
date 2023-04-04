@@ -1,0 +1,38 @@
+FROM osrf/ros:melodic-desktop-full
+
+LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
+
+RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y && apt-get install -y \
+gdb \
+xterm \
+valgrind \
+python-bloom \
+ros-melodic-amcl \
+python-catkin-pkg \
+ros-melodic-moveit \
+ros-melodic-move-base \
+ros-melodic-navigation \
+ros-melodic-gazebo-ros \
+ros-melodic-ros-control \
+ros-melodic-gazebo-plugins \
+ros-melodic-gazebo-ros-pkgs \
+ros-melodic-ros-controllers \
+ros-melodic-controller-manager \
+ros-melodic-effort-controllers \
+ros-melodic-robot-localization \
+ros-melodic-gazebo-ros-control \
+ros-melodic-velocity-controllers \
+ros-melodic-position-controllers \
+ros-melodic-joint-state-publisher \
+ros-melodic-transmission-interface \
+ros-melodic-joint-state-publisher-gui
+
+ARG USER_ID=16661
+ARG GROUP_ID=16661
+
+RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
+
+USER rosez_user
+RUN rosdep update
+
+VOLUME /opt/ros/melodic
