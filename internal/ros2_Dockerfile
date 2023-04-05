@@ -4,6 +4,8 @@ LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
 RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y && apt-get install -y \
 gdb \
+vim \
+tmux \
 xterm \
 valgrind \
 python3-bloom \
@@ -33,6 +35,8 @@ ARG USER_ID=16661
 ARG GROUP_ID=16661
 
 RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
+
+RUN adduser rosez_user video && adduser rosez_user plugdev && adduser rosez_user audio && adduser rosez_user dialout
 
 USER rosez_user
 RUN rosdep update
