@@ -33,6 +33,7 @@ or
 * [For versions >= `v1.2.1`] Users are now able to use their local git configuration (ssh keys etc) and bloom release, from within the ros\*ez environment.
 * [For versions >= `v1.2.2`] There was a problem that was introduced in `v1.2.1` regarding volumes and permissions for user configuration files in ssh, git and bloom. It is now fixed.
 * [For versions >= `v1.2.3`] The installer script now checks if the user is in the docker group, and if not adds them and prompts for reboot at the end of the installation.
+* [For versions >= `v1.3.0`] A ROS Melodic version is now available (with the `rosezm` command) and a much more robust locking mechanism is now in effect. If you experienced frequent lockouts or race conditions, this version should be more stable.
 
 ## Tested platforms
 * EndeavourOS
