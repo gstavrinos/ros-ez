@@ -10,6 +10,11 @@ if [ "$1" == "1" ]; then
     volume="rosez-volume"
     executable_folder_name="ros-ez"
     dockerfile="ros_Dockerfile"
+elif [ "$1" == "3" ]; then
+    image_name="ros_ezm"
+    volume="rosezm-volume"
+    executable_folder_name="ros-ezm"
+    dockerfile="ros_melodic_Dockerfile"
 fi
 sudo pip install rocker==0.2.10
 cd $SCRIPT_DIR
