@@ -117,7 +117,7 @@ if [ ! -d  $ssh_folder ]; then
     mkdir $ssh_folder
 fi
 intermediate_error_handler $?
-x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc $bloom_file:/home/rosez_user/.config/bloom $gitconfig_file:/home/rosez_user/.gitconfig $ssh_folder:/home/rosez_user/.ssh $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
+x=""$(rocker --mode dry-run --network host --x11 $gpu_param --volume $rosez_vol:/opt/ros/$ros/ --volume /dev/input:/dev/input --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc $bloom_file:/home/rosez_user/.config/bloom $gitconfig_file:/home/rosez_user/.gitconfig $ssh_folder:/home/rosez_user/.ssh $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -- $ros_image:latest | tail -n 1 | sed -e "s/-v .*$rosez_vol:/-v $rosez_vol:/")
 intermediate_error_handler $?
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
 intermediate_error_handler $?
