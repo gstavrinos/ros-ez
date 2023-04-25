@@ -8,9 +8,14 @@ vim \
 tmux \
 xterm \
 valgrind \
+python-pip \
+clang-tidy \
+python3-pip \
 python-bloom \
+clang-format-10 \
 ros-melodic-amcl \
 python-catkin-pkg \
+python-catkin-lint \
 ros-melodic-moveit \
 ros-melodic-move-base \
 ros-melodic-navigation \
@@ -37,6 +42,6 @@ RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '
 RUN adduser rosez_user video && adduser rosez_user plugdev && adduser rosez_user audio && adduser rosez_user dialout
 
 USER rosez_user
-RUN rosdep update
+RUN rosdep update && pip3 install pre-commit
 
 VOLUME /opt/ros/melodic

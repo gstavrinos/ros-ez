@@ -8,6 +8,8 @@ vim \
 tmux \
 xterm \
 valgrind \
+clang-tidy \
+catkin-lint \
 python3-bloom \
 python3-catkin-pkg \
 ros-humble-gazebo-ros \

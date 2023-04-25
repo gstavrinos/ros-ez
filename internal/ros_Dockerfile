@@ -8,10 +8,14 @@ vim \
 tmux \
 xterm \
 valgrind \
+clang-tidy \
+catkin-lint \
+python3-pip \
 python3-bloom \
-python3-catkin-pkg \
+clang-format-10 \
 ros-noetic-amcl \
 ros-noetic-moveit \
+python3-catkin-pkg \
 ros-noetic-move-base \
 ros-noetic-navigation \
 ros-noetic-gazebo-ros \
@@ -37,6 +41,6 @@ RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '
 RUN adduser rosez_user video && adduser rosez_user plugdev && adduser rosez_user audio && adduser rosez_user dialout
 
 USER rosez_user
-RUN rosdep update
+RUN rosdep update && pip3 install pre-commit
 
 VOLUME /opt/ros/noetic
