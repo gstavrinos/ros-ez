@@ -8,9 +8,10 @@ xterm \
 valgrind \
 libuvc-dev \
 python3-bloom \
-python3-catkin-pkg \
+openssh-client \
 ros-noetic-amcl \
 ros-noetic-moveit \
+python3-catkin-pkg \
 ros-noetic-move-base \
 ros-noetic-navigation \
 ros-noetic-gazebo-ros \

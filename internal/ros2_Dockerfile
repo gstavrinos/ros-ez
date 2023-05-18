@@ -7,6 +7,7 @@ gdb \
 xterm \
 valgrind \
 python3-bloom \
+openssh-client \
 python3-catkin-pkg \
 ros-humble-gazebo-ros \
 ros-humble-navigation2 \

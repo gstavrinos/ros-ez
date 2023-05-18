@@ -9,6 +9,7 @@ valgrind \
 mesa-utils \
 libuvc-dev \
 python-bloom \
+openssh-client \
 libgl1-mesa-glx \
 ros-melodic-amcl \
 python-catkin-pkg \
