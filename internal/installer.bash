@@ -25,6 +25,20 @@ then
     need_rr=1
 fi
 sudo docker volume create $volume
+sudo docker volume create $volume-bin
+sudo docker volume create $volume-etc
+sudo docker volume create $volume-home
+sudo docker volume create $volume-lib
+sudo docker volume create $volume-lib64
+sudo docker volume create $volume-mnt
+sudo docker volume create $volume-opt
+sudo docker volume create $volume-root
+sudo docker volume create $volume-run
+sudo docker volume create $volume-sbin
+sudo docker volume create $volume-srv
+sudo docker volume create $volume-sys
+sudo docker volume create $volume-usr
+sudo docker volume create $volume-var
 sudo docker build --no-cache --pull -t $image_name -f $SCRIPT_DIR/$dockerfile . --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)
 string_for_bashrc='export PATH="$PATH:'$SCRIPT_DIR/"${executable_folder_name}"'"'
 
