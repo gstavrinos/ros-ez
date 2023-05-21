@@ -6,6 +6,7 @@ RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y
 gdb \
 xterm \
 valgrind \
+pulseaudio \
 mesa-utils \
 libuvc-dev \
 python-bloom \
@@ -13,8 +14,6 @@ openssh-client \
 libgl1-mesa-glx \
 ros-melodic-amcl \
 python-catkin-pkg \
-libatlas-base-dev \
-libgoogle-glog-dev \
 ros-melodic-moveit \
 ros-melodic-move-base \
 ros-melodic-navigation \

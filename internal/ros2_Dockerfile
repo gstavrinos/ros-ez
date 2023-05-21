@@ -6,8 +6,11 @@ RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y &
 gdb \
 xterm \
 valgrind \
+pulseaudio \
+mesa-utils \
 python3-bloom \
 openssh-client \
+libgl1-mesa-glx \
 python3-catkin-pkg \
 ros-humble-gazebo-ros \
 ros-humble-navigation2 \
@@ -39,3 +42,17 @@ USER rosez_user
 RUN rosdep update
 
 VOLUME /opt/ros/humble
+VOLUME /bin
+VOLUME /etc
+VOLUME /home
+VOLUME /lib
+VOLUME /lib64
+VOLUME /mnt
+VOLUME /opt
+VOLUME /root
+VOLUME /run
+VOLUME /sbin
+VOLUME /srv
+VOLUME /sys
+VOLUME /usr
+VOLUME /var
