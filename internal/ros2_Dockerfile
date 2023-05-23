@@ -8,6 +8,7 @@ xterm \
 valgrind \
 pulseaudio \
 mesa-utils \
+libuvc-dev \
 python3-bloom \
 openssh-client \
 libgl1-mesa-glx \
