@@ -35,6 +35,7 @@ or
 * [For versions >= `v1.2.2`] There was a problem that was introduced in `v1.2.1` regarding volumes and permissions for user configuration files in ssh, git and bloom. It is now fixed.
 * [For versions >= `v1.2.3`] The installer script now checks if the user is in the docker group, and if not adds them and prompts for reboot at the end of the installation.
 * [For versions >= `v1.3.0`] A ROS Melodic version is now available (with the `rosezm` command) and a much more robust locking mechanism is now in effect. If you experienced frequent lockouts or race conditions, this version should be more stable.
+* [For versions >= `v1.4.0`] All supported ROS versions (melodic/noetic/humble) now work on a completely persistent filesystem to save apt, library and other installations + all other user-defined changes on the container.
 
 ## Tested platforms
 * EndeavourOS
