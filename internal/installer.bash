@@ -24,7 +24,6 @@ then
     sudo usermod -aG docker $USER
     need_rr=1
 fi
-sudo docker volume create $volume
 sudo docker build --no-cache --pull -t $image_name -f $SCRIPT_DIR/$dockerfile . --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g)
 string_for_bashrc='export PATH="$PATH:'$SCRIPT_DIR/"${executable_folder_name}"'"'
 

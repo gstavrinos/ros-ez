@@ -6,10 +6,15 @@ RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y
 gdb \
 xterm \
 valgrind \
+pulseaudio \
+mesa-utils \
+libuvc-dev \
 python3-bloom \
-python3-catkin-pkg \
+openssh-client \
+libgl1-mesa-glx \
 ros-noetic-amcl \
 ros-noetic-moveit \
+python3-catkin-pkg \
 ros-noetic-move-base \
 ros-noetic-navigation \
 ros-noetic-gazebo-ros \
@@ -36,3 +41,17 @@ USER rosez_user
 RUN rosdep update
 
 VOLUME /opt/ros/noetic
+VOLUME /bin
+VOLUME /etc
+VOLUME /home
+VOLUME /lib
+VOLUME /lib64
+VOLUME /mnt
+VOLUME /opt
+VOLUME /root
+VOLUME /run
+VOLUME /sbin
+VOLUME /srv
+VOLUME /sys
+VOLUME /usr
+VOLUME /var
