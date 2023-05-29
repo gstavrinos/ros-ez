@@ -10,8 +10,8 @@ uptime_date="$(uptime -s | sed "s/[: ]/_/g")"
 # This should enable the "a reboot should fix it" behaviour
 earliest_possible_lock_file="$lock_prefix$uptime_date$lock_suffix"
 lock_file="$lock_prefix$now$lock_suffix"
-known_params=("force-integrated" "clear-locks")
-known_params_short=("fi" "cl")
+known_params=("force-integrated" "clear-locks" "skip-compilation")
+known_params_short=("fi" "cl" "sc")
 rosws_file="ros2_ws.txt"
 rosez_vol="ros2ez-volume"
 ros="humble"
@@ -19,6 +19,7 @@ ros_image="ros2_ez"
 gpu_string=$(lspci | grep VGA)
 gpu_param=""
 clear_locks=0
+skip_compilation=0
 lockdir=""
 if [ "$1" == "1" ]; then
     rosws_file="ros_ws.txt"
@@ -54,6 +55,9 @@ for i in "${!known_params[@]}"; do
         shift
     elif [ "${known_params[1]}" == "$1" ] || [ "${known_params_short[1]}" == "$1" ]; then
         clear_locks=1
+        shift
+    elif [ "${known_params[2]}" == "$1" ] || [ "${known_params_short[2]}" == "$1" ]; then
+        skip_compilation=1
         shift
     else
         break
@@ -126,7 +130,7 @@ intermediate_error_handler $?
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
 intermediate_error_handler $?
 cl=""
-extras="env $ENV LOCKFILE=$lock_file /bin/bash"
+extras="env $ENV LOCKFILE=$lock_file SKIPCOMPILATION=$skip_compilation /bin/bash"
 if [ $# -gt 0 ]; then
     extras=$extras" -c \"source /home/rosez_user/.bashrc && $* \""
 fi
