@@ -1,5 +1,6 @@
 #!/bin/bash
 lock_file=$LOCKFILE
+skip_compilation=$SKIPCOMPILATION
 rosversion="unknown"
 lockation=""
 wstxt="ros2_ws.txt"
@@ -30,24 +31,28 @@ if [ "$rosversion" != "unknown" ]; then
     while read -r line; do
         bl="$(basename $line)"
         cd /opt/ros/$bl
-        # Check if -r is better here instead of -i (rosdep check/install -r)
-        # I think I should just add both (-ir)
-        if rosdep check -ir --from-path src --rosdistro $rosversion -y | grep -q 'System dependencies have not been satisfied'; then
-            intermediate_error_handler $?
-            output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "sudo apt update" | tee /dev/fd/2)
+        if [ $skip_compilation -ne 1 ]; then
+            if rosdep check -ir --from-path src --rosdistro $rosversion -y | grep -q 'System dependencies have not been satisfied'; then
+                intermediate_error_handler $?
+                output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "sudo apt update" | tee /dev/fd/2)
 
+                intermediate_error_handler $?
+            fi
+            output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "rosdep install -ir --from-path src --rosdistro $rosversion -y" | tee /dev/fd/2)
             intermediate_error_handler $?
         fi
-        output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "rosdep install -ir --from-path src --rosdistro $rosversion -y" | tee /dev/fd/2)
-        intermediate_error_handler $?
         if [ "$rosversion" == "humble" ]; then
-            output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" | tee /dev/fd/2)
-            intermediate_error_handler $?
+            if [ $skip_compilation -ne 1 ]; then
+                output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" | tee /dev/fd/2)
+                intermediate_error_handler $?
+            fi
             . /opt/ros/$bl/install/setup.bash
             intermediate_error_handler $?
         else
-            output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "catkin_make" | tee /dev/fd/2)
-            intermediate_error_handler $?
+            if [ $skip_compilation -ne 1 ]; then
+                output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "catkin_make" | tee /dev/fd/2)
+                intermediate_error_handler $?
+            fi
             . /opt/ros/$bl/devel/setup.bash
             intermediate_error_handler $?
         fi
