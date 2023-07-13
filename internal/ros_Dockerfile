@@ -2,7 +2,7 @@ FROM osrf/ros:noetic-desktop-full
 
 LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
-RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y && apt-get install -y \
+RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 gdb \
 xterm \
 valgrind \

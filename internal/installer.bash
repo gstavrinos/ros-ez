@@ -15,6 +15,11 @@ elif [ "$1" == "3" ]; then
     volume="rosezm-volume"
     executable_folder_name="ros-ezm"
     dockerfile="ros_melodic_Dockerfile"
+elif [ "$1" == "4" ]; then
+    image_name="ros2_ezf"
+    volume="ros2ezf-volume"
+    executable_folder_name="ros2-ezf"
+    dockerfile="ros2_foxy_Dockerfile"
 fi
 sudo pip install rocker==0.2.10
 cd $SCRIPT_DIR
