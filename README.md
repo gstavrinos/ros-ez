@@ -37,7 +37,7 @@ or
 * [For versions >= `v1.3.0`] A ROS Melodic version is now available (with the `rosezm` command) and a much more robust locking mechanism is now in effect. If you experienced frequent lockouts or race conditions, this version should be more stable.
 * [For versions >= `v1.4.0`] All supported ROS versions (melodic/noetic/humble) now work on a completely persistent filesystem to save apt, library and other installations + all other user-defined changes on the container. Additionally, this version also supports audio, enabling users to play sounds through the `rosez` containers.
 * [For versions >= `v1.5.0`] The `sc` or `skip-compilation` flag is now supported, which completely bypasses rosdep and catkin/colcon builds for faster startup.
-
+* [For versions >= `v1.6.0`] A ROS2 Foxy version is now available (with the `ros2ezf` command). Its image comes with built-in `ros1_bridge` support for *ez* ROS1-ROS2 integration.
 ## Tested platforms
 * EndeavourOS
 * Fedora 35
