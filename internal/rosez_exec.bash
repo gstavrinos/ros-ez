@@ -31,6 +31,11 @@ elif [ "$1" == "3" ]; then
     rosez_vol="rosezm-volume"
     ros="melodic"
     ros_image="ros_ezm"
+elif [ "$1" == "4" ]; then
+    rosws_file="ros2f_ws.txt"
+    rosez_vol="ros2ezf-volume"
+    ros="foxy"
+    ros_image="ros2_ezf"
 fi
 shift
 trap 'signal_handler' $signal_list
@@ -39,6 +44,10 @@ lockation=""
 while read -r line
 do
     wsdir=$(eval echo -e "$line")
+    if [ ! -d "$wsdir" ]; then
+        echo "$wsdir not found, creating it"
+        mkdir -p $wsdir/src
+    fi
     volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
     if [[ -z $lockation ]]; then
         # lockdir=$(basename wsdir)
@@ -122,6 +131,8 @@ if [ ! -d  $ssh_folder ]; then
 fi
 intermediate_error_handler $?
 x=""$(rocker --mode dry-run --network host --x11 --pulse $gpu_param --volume $rosez_vol-bin:/bin --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-home:/home/ --volume $rosez_vol-lib:/lib/ --volume $rosez_vol-lib64:/lib64/ --volume $rosez_vol-mnt:/mnt/ --volume $rosez_vol-opt:/opt/ --volume $rosez_vol-root:/root/ --volume $rosez_vol-run:/run/ --volume $rosez_vol-sbin:/sbin/ --volume $rosez_vol-srv:/srv/ --volume $rosez_vol-sys:/sys/ --volume $rosez_vol-usr:/usr --volume $rosez_vol-var:/var --volume $rosez_vol:/opt/ros/$ros --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc --volume /dev:/dev --volume $bloom_file:/home/rosez_user/.config/bloom --volume $gitconfig_file:/home/rosez_user/.gitconfig --volume $ssh_folder:/home/rosez_user/.ssh --volume $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash --volume /:$HOME/.$rosez_vol -- $ros_image:latest | tail -n 1 | sed -e "s#-v $(pwd)/$rosez_vol#-v $rosez_vol#g")
+echo "------;)----"
+echo $x
 intermediate_error_handler $?
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
 intermediate_error_handler $?

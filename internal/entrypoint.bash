@@ -6,6 +6,9 @@ lockation=""
 wstxt="ros2_ws.txt"
 if [ -f /opt/ros/humble/setup.bash ]; then
     rosversion="humble"
+elif [ -f /opt/ros/foxy/setup.bash ]; then
+    rosversion="foxy"
+    wstxt="ros2f_ws.txt"
 elif [ -f /opt/ros/noetic/setup.bash ]; then
     rosversion="noetic"
     wstxt="ros_ws.txt"
@@ -41,7 +44,7 @@ if [ "$rosversion" != "unknown" ]; then
             output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "rosdep install -ir --from-path src --rosdistro $rosversion -y" | tee /dev/fd/2)
             intermediate_error_handler $?
         fi
-        if [ "$rosversion" == "humble" ]; then
+        if [ "$rosversion" == "humble" ] || [ "$rosversion" == "foxy" ]; then
             if [ $skip_compilation -ne 1 ]; then
                 output=$(script --flush --quiet --return /tmp/ansible-output.txt --command "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" | tee /dev/fd/2)
                 intermediate_error_handler $?

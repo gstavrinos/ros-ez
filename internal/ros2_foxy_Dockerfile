@@ -1,0 +1,60 @@
+FROM osrf/ros:foxy-ros1-bridge
+
+LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
+
+RUN apt-get update --allow-insecure-repositories && apt-get install -y curl && curl http://repo.ros2.org/repos.key | apt-key add - && apt-get update && apt-get full-upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+gdb \
+xterm \
+valgrind \
+pulseaudio \
+mesa-utils \
+libuvc-dev \
+python3-bloom \
+openssh-client \
+libgl1-mesa-glx \
+ros-foxy-desktop \
+python3-catkin-pkg \
+ros-foxy-gazebo-ros \
+ros-foxy-navigation2 \
+ros-foxy-nav2-bringup \
+ros-foxy-ros2-control \
+ros-foxy-slam-toolbox \
+ros-foxy-gazebo-plugins \
+ros-foxy-ros2controlcli \
+ros-foxy-gazebo-ros-pkgs \
+ros-foxy-control-toolbox \
+ros-foxy-ros2-controllers \
+ros-foxy-rmw-cyclonedds-cpp \
+ros-foxy-controller-manager \
+ros-foxy-effort-controllers \
+ros-foxy-robot-localization \
+ros-foxy-gazebo-ros2-control \
+ros-foxy-velocity-controllers \
+ros-foxy-position-controllers \
+ros-foxy-joint-state-publisher \
+ros-foxy-transmission-interface \
+ros-foxy-joint-state-publisher-gui
+
+ARG USER_ID=16661
+ARG GROUP_ID=16661
+
+RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
+
+USER rosez_user
+RUN rosdep update
+
+VOLUME /opt/ros/foxy
+VOLUME /bin
+VOLUME /etc
+VOLUME /home
+VOLUME /lib
+VOLUME /lib64
+VOLUME /mnt
+VOLUME /opt
+VOLUME /root
+VOLUME /run
+VOLUME /sbin
+VOLUME /srv
+VOLUME /sys
+VOLUME /usr
+VOLUME /var
