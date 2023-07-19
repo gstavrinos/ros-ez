@@ -28,7 +28,7 @@ trap 'signal_handler' $signal_list
 if [ "$rosversion" != "unknown" ]; then
     # sudo touch $lockation/$lock_file
     . /opt/ros/$rosversion/setup.bash
-    if [ "$rosversion" == "humble" ]; then
+    if [ "$rosversion" == "humble" ] || [ "$rosversion" == "foxy" ]; then
         export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     fi
     while read -r line; do
