@@ -1,24 +1,19 @@
 #!/bin/bash
+source /home/rosez_user/helpers.bash
+get_supported_versions
 lock_file=$LOCKFILE
 skip_compilation=$SKIPCOMPILATION
 rosversion="unknown"
 lockation=""
-wstxt="ros2_ws.txt"
-if [ -f /opt/ros/humble/setup.bash ]; then
-    rosversion="humble"
-elif [ -f /opt/ros/foxy/setup.bash ]; then
-    rosversion="foxy"
-    wstxt="ros2f_ws.txt"
-elif [ -f /opt/ros/noetic/setup.bash ]; then
-    rosversion="noetic"
-    wstxt="ros_ws.txt"
-elif [ -f /opt/ros/melodic/setup.bash ]; then
-    rosversion="melodic"
-    wstxt="rosm_ws.txt"
-fi
+wstxt=""
+for i in $(seq 0 $(( ${#distros[@]}-1 )) ); do
+    if [ -f /opt/ros/"${distros[$i]}"/setup.bash ]; then
+        rosversion="${distros[$i]}"
+        wstxt="${workspaces[$i]}"
+    fi
+done
 read -r lockdir</opt/ros/$wstxt
 lockation="/opt/ros/$(basename $lockdir)"
-source /home/rosez_user/helpers.bash
 if [ "$ROSEZCLEARLOCKS" == "ros-ez-CL" ]; then
     echo -e "${colour_orange}I was passed the clear-locks flag. Deleting all lock files...$colour_end"
     sudo rm -f $lockation/$lock_prefix*$lock_suffix
