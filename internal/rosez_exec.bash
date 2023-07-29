@@ -10,8 +10,6 @@ uptime_date="$(uptime -s | sed "s/[: ]/_/g")"
 # This should enable the "a reboot should fix it" behaviour
 earliest_possible_lock_file="$lock_prefix$uptime_date$lock_suffix"
 lock_file="$lock_prefix$now$lock_suffix"
-known_params=("force-integrated" "clear-locks" "skip-compilation")
-known_params_short=("fi" "cl" "sc")
 rosws_file="ros2_ws.txt"
 rosez_vol="ros2ez-volume"
 ros="humble"
@@ -20,6 +18,8 @@ gpu_string=$(lspci | grep VGA)
 gpu_param=""
 clear_locks=0
 skip_compilation=0
+non_interactive=0
+no_sound=0
 lockdir=""
 if [ "$1" == "1" ]; then
     rosws_file="ros_ws.txt"
@@ -49,8 +49,7 @@ do
         mkdir -p $wsdir/src
     fi
     volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
-    if [[ -z $lockation ]]; then
-        # lockdir=$(basename wsdir)
+    if [[ -z "$lockation" ]]; then
         lockation=$wsdir
     fi
 done < $SCRIPT_DIR/../includes/$rosws_file
@@ -67,6 +66,12 @@ for i in "${!known_params[@]}"; do
         shift
     elif [ "${known_params[2]}" == "$1" ] || [ "${known_params_short[2]}" == "$1" ]; then
         skip_compilation=1
+        shift
+    elif [ "${known_params[3]}" == "$1" ] || [ "${known_params_short[3]}" == "$1" ]; then
+        non_interactive=1
+        shift
+    elif [ "${known_params[4]}" == "$1" ] || [ "${known_params_short[4]}" == "$1" ]; then
+        no_sound=1
         shift
     else
         break
@@ -98,10 +103,11 @@ while [ $locked -gt 0 ]; do
     # ---
     # A new lock_file is created, since the other rosez
     # process will instantly get priority with the cl flag.
-    if [ -z "$found_lock" ]; then
+    echo $found_lock
+    if [[ -z "$found_lock" ]]; then
         now="$(date +'%Y-%m-%d_%H_%M_%S_%N')"
         lock_file="$lock_prefix$now$lock_suffix"
-        sudo touch $lockation/$lock_file
+        touch $lockation/$lock_file
         found_lock=$lockation/$lock_file
     fi
     fl="$(basename $found_lock)"
@@ -130,8 +136,11 @@ if [ ! -d  $ssh_folder ]; then
     mkdir $ssh_folder
 fi
 intermediate_error_handler $?
-x=""$(rocker --mode dry-run --network host --x11 --pulse $gpu_param --volume $rosez_vol-bin:/bin --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-home:/home/ --volume $rosez_vol-lib:/lib/ --volume $rosez_vol-lib64:/lib64/ --volume $rosez_vol-mnt:/mnt/ --volume $rosez_vol-opt:/opt/ --volume $rosez_vol-root:/root/ --volume $rosez_vol-run:/run/ --volume $rosez_vol-sbin:/sbin/ --volume $rosez_vol-srv:/srv/ --volume $rosez_vol-sys:/sys/ --volume $rosez_vol-usr:/usr --volume $rosez_vol-var:/var --volume $rosez_vol:/opt/ros/$ros --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc --volume /dev:/dev --volume $bloom_file:/home/rosez_user/.config/bloom --volume $gitconfig_file:/home/rosez_user/.gitconfig --volume $ssh_folder:/home/rosez_user/.ssh --volume $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash --volume /:$HOME/.$rosez_vol -- $ros_image:latest | tail -n 1 | sed -e "s#-v $(pwd)/$rosez_vol#-v $rosez_vol#g")
-echo "------;)----"
+sound="--pulse"
+if [ $no_sound -gt 0 ]; then
+    sound=""
+fi
+x=""$(rocker --mode dry-run --network host --x11 $sound $gpu_param --volume $rosez_vol-bin:/bin --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-home:/home/ --volume $rosez_vol-lib:/lib/ --volume $rosez_vol-lib64:/lib64/ --volume $rosez_vol-mnt:/mnt/ --volume $rosez_vol-opt:/opt/ --volume $rosez_vol-root:/root/ --volume $rosez_vol-run:/run/ --volume $rosez_vol-sbin:/sbin/ --volume $rosez_vol-srv:/srv/ --volume $rosez_vol-sys:/sys/ --volume $rosez_vol-usr:/usr --volume $rosez_vol-var:/var --volume $rosez_vol:/opt/ros/$ros --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc --volume /dev:/dev --volume $bloom_file:/home/rosez_user/.config/bloom --volume $gitconfig_file:/home/rosez_user/.gitconfig --volume $ssh_folder:/home/rosez_user/.ssh --volume $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt --volume $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash --volume /:$HOME/.$rosez_vol -- $ros_image:latest | tail -n 1 | sed -e "s#-v $(pwd)/$rosez_vol#-v $rosez_vol#g")
 echo $x
 intermediate_error_handler $?
 xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
@@ -148,7 +157,11 @@ fi
 x="$x $extras"
 userid=$(id -u)
 groupid=$(id -g)
-x=${x/docker run --rm -it/docker run --rm -it -u $userid --ipc=host --privileged}
+it="-it"
+if [ $non_interactive -gt 0 ]; then
+    it=""
+fi
+x=${x/docker run --rm -it/docker run --rm $it -u $userid --ipc=host --privileged}
 intermediate_error_handler $?
 printf "Executing:\n---\n$x\n---\n"
 eval "$x"
