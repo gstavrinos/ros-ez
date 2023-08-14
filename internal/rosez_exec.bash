@@ -59,7 +59,7 @@ done < $SCRIPT_DIR/../includes/$rosws_file
 # to catch all the flags
 for i in "${!known_params[@]}"; do
     if [ "${known_params[0]}" == "$1" ] || [ "${known_params_short[0]}" == "$1" ]; then
-        gpu_param="--device /dev/dri/card0"
+        gpu_param="--gpus 0"
         shift
     elif [ "${known_params[1]}" == "$1" ] || [ "${known_params_short[1]}" == "$1" ]; then
         clear_locks=1
@@ -80,10 +80,10 @@ done
 if [ -z "$gpu_param" ]; then
     if grep -q "nvidia" <<< "$gpu_string" || grep -q "Nvidia" <<< "$gpu_string" || grep -q "NVIDIA" <<< "$gpu_string"
     then
-        gpu_param="--nvidia"
+        gpu_param="--gpus all"
     elif grep -q "intel" <<< "$gpu_string" || grep -q "Intel" <<< "$gpu_string" || grep -q "INTEL" <<< "$gpu_string"
     then
-        gpu_param="--device /dev/dri/card0"
+        gpu_param="--gpus 0"
     else
         echo "No Nvidia or Intel GPU found. This case has not been investigated yet. GUI integration might be broken. (Good luck!)"
     fi
@@ -136,32 +136,27 @@ if [ ! -d  $ssh_folder ]; then
     mkdir $ssh_folder
 fi
 intermediate_error_handler $?
-sound="--pulse"
+sound="-v /run/user/$userid/pulse:/run/user/$userid/pulse --device /dev/snd -e PULSE_SERVER=unix:/run/user/$userid/pulse/native -v /run/user/$userid/pulse/native:/run/user/$userid/pulse/native"
 if [ $no_sound -gt 0 ]; then
     sound=""
 fi
-x=""$(rocker --mode dry-run --network host --x11 $sound $gpu_param --volume $rosez_vol-bin:/bin --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-etc:/etc/ --volume $rosez_vol-home:/home/ --volume $rosez_vol-lib:/lib/ --volume $rosez_vol-lib64:/lib64/ --volume $rosez_vol-mnt:/mnt/ --volume $rosez_vol-opt:/opt/ --volume $rosez_vol-root:/root/ --volume $rosez_vol-run:/run/ --volume $rosez_vol-sbin:/sbin/ --volume $rosez_vol-srv:/srv/ --volume $rosez_vol-sys:/sys/ --volume $rosez_vol-usr:/usr --volume $rosez_vol-var:/var --volume $rosez_vol:/opt/ros/$ros --volume $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes $SCRIPT_DIR/../internal/entrypoint.bash:/home/rosez_user/.bashrc --volume /dev:/dev --volume $bloom_file:/home/rosez_user/.config/bloom --volume $gitconfig_file:/home/rosez_user/.gitconfig --volume $ssh_folder:/home/rosez_user/.ssh --volume $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt --volume $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash --volume /:$HOME/.$rosez_vol -- $ros_image:latest | tail -n 1 | sed -e "s#-v $(pwd)/$rosez_vol#-v $rosez_vol#g")
-echo $x
-intermediate_error_handler $?
-xauthf="$((echo \"$x\") | grep -E -o '/tmp/.docker[a-zA-Z0-9_-]+.xauth' | head -1)"
-intermediate_error_handler $?
+it="-it"
+if [ $non_interactive -gt 0 ]; then
+    it=""
+fi
+userid=$(id -u)
+xauthf="/tmp/.$ros_image-$now.xauth"
 touch $xauthf
 intermediate_error_handler $?
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
 intermediate_error_handler $?
-cl=""
+x="docker run --rm $it -u $userid --ipc=host --privileged --network host $gpu_param $sound --group-add dialout --group-add video --group-add audio -v $rosez_vol-bin:/bin -v $rosez_vol-etc:/etc/ -v $rosez_vol-etc:/etc/ -v $rosez_vol-home:/home/ -v $rosez_vol-lib:/lib/ -v $rosez_vol-lib64:/lib64/ -v $rosez_vol-mnt:/mnt/ -v $rosez_vol-opt:/opt/ -v $rosez_vol-root:/root/ -v $rosez_vol-run:/run/ -v $rosez_vol-sbin:/sbin/ -v $rosez_vol-srv:/srv/ -v $rosez_vol-sys:/sys/ -v $rosez_vol-usr:/usr -v $rosez_vol-var:/var -v $rosez_vol:/opt/ros/$ros -v $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes -v $SCRIPT_DIR/entrypoint.bash:/home/rosez_user/.bashrc -v /dev:/dev -v $bloom_file:/home/rosez_user/.config/bloom -v $gitconfig_file:/home/rosez_user/.gitconfig -v $ssh_folder:/home/rosez_user/.ssh -v $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt -v $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -v /:$HOME/.$rosez_vol -e DISPLAY -e TERM -e QT_X11_NO_MITSHM=1 -e XAUTHORITY=$xauthf -v $xauthf:$xauthf -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro $ros_image:latest"
+intermediate_error_handler $?
 extras="env $ENV LOCKFILE=$lock_file SKIPCOMPILATION=$skip_compilation /bin/bash"
 if [ $# -gt 0 ]; then
     extras=$extras" -c \"source /home/rosez_user/.bashrc && $* \""
 fi
 x="$x $extras"
-userid=$(id -u)
-groupid=$(id -g)
-it="-it"
-if [ $non_interactive -gt 0 ]; then
-    it=""
-fi
-x=${x/docker run --rm -it/docker run --rm $it -u $userid --ipc=host --privileged}
 intermediate_error_handler $?
 printf "Executing:\n---\n$x\n---\n"
 eval "$x"
