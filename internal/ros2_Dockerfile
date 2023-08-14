@@ -40,7 +40,7 @@ ARG GROUP_ID=16661
 RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
 
 USER rosez_user
-RUN rosdep update
+RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update
 
 VOLUME /opt/ros/humble
 VOLUME /bin
