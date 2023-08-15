@@ -59,7 +59,7 @@ done < $SCRIPT_DIR/../includes/$rosws_file
 # to catch all the flags
 for i in "${!known_params[@]}"; do
     if [ "${known_params[0]}" == "$1" ] || [ "${known_params_short[0]}" == "$1" ]; then
-        gpu_param="--gpus 0"
+        gpu_param="--device /dev/dri/card0"
         shift
     elif [ "${known_params[1]}" == "$1" ] || [ "${known_params_short[1]}" == "$1" ]; then
         clear_locks=1
@@ -83,7 +83,7 @@ if [ -z "$gpu_param" ]; then
         gpu_param="--gpus all"
     elif grep -q "intel" <<< "$gpu_string" || grep -q "Intel" <<< "$gpu_string" || grep -q "INTEL" <<< "$gpu_string"
     then
-        gpu_param="--gpus 0"
+        gpu_param="--device /dev/dri/card0"
     else
         echo "No Nvidia or Intel GPU found. This case has not been investigated yet. GUI integration might be broken. (Good luck!)"
     fi
