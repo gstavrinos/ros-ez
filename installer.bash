@@ -41,7 +41,6 @@ if [[ -z "$image_name" ]]; then
     done
     exit -1
 fi
-sudo pip install rocker==0.2.10
 cd $SCRIPT_DIR
 need_rr=0
 if ! id -nGz "$USER" | grep -qzxF "docker"

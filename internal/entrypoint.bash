@@ -1,4 +1,5 @@
 #!/bin/bash
+sudo find /home/rosez_user ! -user rosez_user -execdir sudo chown rosez_user:rosez_user {} \+
 source /home/rosez_user/helpers.bash
 get_supported_versions
 lock_file=$LOCKFILE
@@ -6,7 +7,6 @@ skip_compilation=$SKIPCOMPILATION
 rosversion="unknown"
 lockation=""
 wstxt=""
-find /home/rosez_user ! -user rosez_user -execdir sudo chown rosez_user:rosez_user {} \+
 for i in $(seq 0 $(( ${#distros[@]}-1 )) ); do
     if [ -f /opt/ros/"${distros[$i]}"/setup.bash ]; then
         rosversion="${distros[$i]}"

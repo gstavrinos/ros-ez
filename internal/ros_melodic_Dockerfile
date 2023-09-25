@@ -1,4 +1,10 @@
+FROM nvidia/opengl:1.2-glvnd-devel-ubuntu18.04 as nvidia
+
 FROM osrf/ros:melodic-desktop-full
+
+COPY --from=nvidia /usr/local /usr/local
+
+ENV NVIDIA_VISIBLE_DEVICES=all NVIDIA_DRIVER_CAPABILITIES=all
 
 LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
@@ -40,18 +46,18 @@ RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '
 USER rosez_user
 RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update
 
-VOLUME /opt/ros/melodic
-VOLUME /bin
-VOLUME /etc
-VOLUME /home
-VOLUME /lib
-VOLUME /lib64
-VOLUME /mnt
-VOLUME /opt
-VOLUME /root
-VOLUME /run
-VOLUME /sbin
-VOLUME /srv
-VOLUME /sys
-VOLUME /usr
-VOLUME /var
+VOLUME /opt/ros/melodic\
+/bin\
+/etc\
+/home\
+/lib\
+/lib64\
+/mnt\
+/opt\
+/root\
+/run\
+/sbin\
+/srv\
+/sys\
+/usr\
+/var
