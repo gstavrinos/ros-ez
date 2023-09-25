@@ -1,6 +1,6 @@
 FROM nvidia/opengl:1.2-glvnd-devel-ubuntu20.04 as nvidia
 
-FROM osrf/ros:melodic-desktop-full
+FROM osrf/ros:foxy-ros1-bridge
 
 COPY --from=nvidia /usr/local /usr/local
 

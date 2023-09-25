@@ -1,6 +1,6 @@
 FROM nvidia/opengl:1.2-glvnd-devel-ubuntu22.04 as nvidia
 
-FROM osrf/ros:melodic-desktop-full
+FROM osrf/ros:humble-desktop-full
 
 COPY --from=nvidia /usr/local /usr/local
 
