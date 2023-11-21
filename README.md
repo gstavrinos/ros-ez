@@ -1,6 +1,6 @@
 <img src=media/rosez.png width="444px"/>
 
-Docker hacks for quick and easy access to ROS2 (humble) and ROS1 (noetic) along with their GUI applications like Gazebo and rViz without the need for a local installation
+Docker hacks for quick and easy access to ROS2 (foxy, humble) and ROS1 (melodic, noetic) along with their GUI applications like Gazebo and rViz without the need for a local installation
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Docker hacks for quick and easy access to ROS2 (humble) and ROS1 (noetic) along 
 * Make sure your system satisfies all the requirements. The installer script tries to remain distro-agnostic, thus does not install anything.
 * Run the `installer.bash` script with a single argument with the rosez version you need to install. e.g. `./installer.bash ros2ez`. You can also run it interactively with no arguments. For ros-ez versions < `1.7.0`, you must use one of the `ros_*installer.bash` scripts. There are multiple, one for each supported ROS distribution.
 * Run `. ~/.bashrc` or open a new terminal.
-* Run `ros2ez` for ROS2 or `rosez` for ROS1 followed by the command you want to run else you will be thrown in a shell inside the image (useful if autocomplete is required).
+* Run `ros2ez` for ROS2 Humble, `ros2ezf` for ROS2 Foxy or `rosez` for ROS1 Noetic and `rosezm` for ROS1 Melodic followed by the command you want to run else. If no command is provided you will be thrown in a shell inside the image (useful when autocomplete is required).
 
 #### Examples
 
@@ -40,6 +40,7 @@ or
 * [For versions >= `v1.6.1`] A deletion script has been included inside the `internal/deeper/` folder. It takes the version-to-delete as an argument. For example, `bash delete_version.bash ros2ezf` deletes the Foxy version for rosez.
 * [For versions >= `v1.7.0`] A new script to easily create systemd services was added. It can be used interactively using `dialog` or non-interactively by passing it 9 arguments. Running the `create_rosez_systemd_service.bash` with less than 9 args (but more than 0) will trigger a help message. Additionally the installation scripts have been merged into one, `installer.bash`. You can now use it interactively, or pass a single argument with the rosez version you need to install. e.g. `./installer.bash ros2ez`
 * [For versions >= `v2.0.0`] Docker devices like sound and graphics are now manually handled. This version is **NOT** the same as the previous ones. This is a pretty substantial change, thus getting a major release. Externally nothing should change for the end user, but internally a lot has changed. OSRF's `rocker` is no longer utilized, making docker handling more versatile (but also fragile).
+* [For versions >= `v2.0.1`] Sound itegration is now working normally. The bug was introduced in `v2.0.0`.
 
 ## Tested platforms
 * EndeavourOS
