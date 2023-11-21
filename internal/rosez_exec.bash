@@ -21,6 +21,7 @@ skip_compilation=0
 non_interactive=0
 no_sound=0
 lockdir=""
+userid=$(id -u)
 if [ "$1" == "1" ]; then
     rosws_file="ros_ws.txt"
     rosez_vol="rosez-volume"
@@ -144,7 +145,6 @@ it="-it"
 if [ $non_interactive -gt 0 ]; then
     it=""
 fi
-userid=$(id -u)
 xauthf="/tmp/.$ros_image-$now.xauth"
 touch $xauthf
 intermediate_error_handler $?
