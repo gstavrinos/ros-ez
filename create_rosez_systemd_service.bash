@@ -6,32 +6,24 @@ else
     systemd_system_service_dir=$(dirname $sudo_service_location)
 fi
 if [ "$#" -gt 0 ]; then
-    if [ "$#" -ne 9 ]; then
-        printf "9 arguments are needed.\n\
+    if [ "$#" -ne 5 ]; then
+        printf "5 arguments are needed.\n\
         1st arg: rosez version.\n\
-        2nd arg: Systemd before field.\n\
-        3rd arg: Systemd after field.\n\
-        4th arg: rosez flags ('ni' and 'ns' are enabled by default and can't be disabled. Also 'fi' is recommended).\n\
-        5th arg: The ros command.\n\
-        6th arg: Systemd restart field.\n\
-        7th arg: Systemd wanted by field.\n\
-        8th arg: Systemd required by field.\n\
-        9th arg: Systemd service filename (without suffix).\n\
+        2nd arg: rosez flags ('ni' and 'ns' are enabled by default and can't be disabled. Also 'fi' is recommended).\n\
+        3rd arg: The ros command.\n\
+        4th arg: Systemd restart field.\n\
+        5th arg: Systemd service filename (without suffix).\n\
         Fields that are not required should be passed an empty string (\"\")\n\n
         Example 'roscore' command for ROS Melodic:\n\
-        create_rosez_systemd_service.bash \"rosezm\" \"\" \"network.target\" \"cl\" \"roscore\" \"always\" \"graphical.target\" \"\" \"noetic_roscore\"
+        create_rosez_systemd_service.bash \"rosezm\" \"cl\" \"roscore\" \"always\" \"melodic_roscore\"
         "
         exit
     else
         rosez_version=$1
-        before_field=$2
-        after_field=$3
-        rosez_flags=$4
-        command_input=$5
-        restart_field=$6
-        wanted_by_field=$7
-        required_by_field=$8
-        service_filename=$9
+        rosez_flags=$2
+        command_input=$3
+        restart_field=$4
+        service_filename=$5
         if [ -z "$command_input" ]; then
             printf "The ROS command cannot be empty. Exiting..."
             exit
@@ -42,20 +34,8 @@ if [ "$#" -gt 0 ]; then
         fi
         service_filename="$service_filename.service"
         exec_start_field="ExecStart=$(command -v $rosez_version) $rosez_flags ni ns $command_input"
-        if [ -n "$before_field" ]; then
-            before_field="Before=$before_field"
-        fi
-        if [ -n "$after_field" ]; then
-            after_field="After=$after_field"
-        fi
         if [ -n "$restart_field" ]; then
             restart_field="Restart=$restart_field"
-        fi
-        if [ -n "$wanted_by_field" ]; then
-            wanted_by_field="WantedBy=$wanted_by_field"
-        fi
-        if [ -n "$required_by_field" ]; then
-            required_by_field="RequiredBy=$required_by_field"
         fi
     fi
 else
@@ -92,34 +72,6 @@ else
     for i in $(seq 0 $(( ${#systemd_targets[@]}-1 )) ); do
         choices="$choices\"${systemd_targets[$i]}\" \"\" \"on\" "
     done
-    # unit before field
-    before_field=""
-    run_dialog_command "--radiolist" "Select a systemd target for [Unit] Before" ${#systemd_targets[@]} "$choices"
-    selected_before=$choice
-    if [[ "$selected_before" != "Skip" ]]; then
-        before_field="Before=$selected_before"
-    fi
-    # unit after field
-    after_field=""
-    run_dialog_command "--radiolist" "Select a systemd target for [Unit] After" ${#systemd_targets[@]} "$choices"
-    selected_after=$choice
-    if [[ "$selected_after" != "Skip" ]]; then
-        after_field="After=$selected_after"
-    fi
-    # install wanted by field
-    wanted_by_field=""
-    run_dialog_command "--radiolist" "Select a systemd target for [Install] WantedBy" ${#systemd_targets[@]} "$choices"
-    selected_wanted_by=$choice
-    if [[ "$selected_wanted_by" != "Skip" ]]; then
-        wanted_by_field="WantedBy=$selected_wanted_by"
-    fi
-    # install required by field
-    required_by_field=""
-    run_dialog_command "--radiolist" "Select a systemd target for [Install] RequiredBy" ${#systemd_targets[@]} "$choices"
-    selected_required_by=$choice
-    if [[ "$selected_required_by" != "Skip" ]]; then
-        required_by_field="RequiredBy=$selected_required_by"
-    fi
     # service exec start field
     exec_start_field="ExecStart=$(command -v $selected_version) $selected_flags $command_input"
     # service restart field
@@ -135,22 +87,19 @@ fi
 systemd_service="\
 [Unit]\n\
 Description=Auto-generated service file for rosez automation with command $command_input.\n\
-$before_field\n\
-$after_field\n\
+After=multi-user.target\n
+Requires=network.target\n
 \n\
 [Service]\n\
 Type=simple\n\
 User=$(whoami)\n\
 Group=$(id -gn)\n\
 WorkingDirectory=$HOME\n\
-# Environment=\"DISPLAY=$DISPLAY\"\n\
-# Environment=\"XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR\"\n\
 $exec_start_field\n\
 $restart_field\n\
 \n\
 [Install]\n\
-$wanted_by_field\n\
-$required_by_field\n\
+WantedBy=default.target\n
 "
 if [ "$#" -eq 0 ]; then
     # Confirmation
