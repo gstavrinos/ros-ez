@@ -40,10 +40,17 @@ or
 * [For versions >= `v1.6.1`] A deletion script has been included inside the `internal/deeper/` folder. It takes the version-to-delete as an argument. For example, `bash delete_version.bash ros2ezf` deletes the Foxy version for rosez.
 * [For versions >= `v1.7.0`] A new script to easily create systemd services was added. It can be used interactively using `dialog` or non-interactively by passing it 9 arguments. Running the `create_rosez_systemd_service.bash` with less than 9 args (but more than 0) will trigger a help message. Additionally the installation scripts have been merged into one, `installer.bash`. You can now use it interactively, or pass a single argument with the rosez version you need to install. e.g. `./installer.bash ros2ez`
 * [For versions >= `v2.0.0`] Docker devices like sound and graphics are now manually handled. This version is **NOT** the same as the previous ones. This is a pretty substantial change, thus getting a major release. Externally nothing should change for the end user, but internally a lot has changed. OSRF's `rocker` is no longer utilized, making docker handling more versatile (but also fragile).
-* [For versions >= `v2.0.1`] Sound itegration is now working normally. The bug was introduced in `v2.0.0`.
+* [For versions >= `v2.0.1`] Sound integration is now working normally. The bug was introduced in `v2.0.0`.
+* [For versions >= `v2.0.2`] Simplification of the systemd service generation.
+* [For versions >= `v2.1.0`] First attempt to use (runtime) host folders instead of saving them on volumes (for /mnt, /run, /sys).
 
-## Tested platforms
+## Tested Linux distributions
 * EndeavourOS
-* Fedora 35
+* Fedora 35, 36, 39, 40
 * Ubuntu 22.04
 * MX Linux 19.1
+* Windows through WSL2 (experimental)
+
+## Tested display servers
+* X11
+* Wayland
