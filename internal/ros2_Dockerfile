@@ -1,4 +1,4 @@
-FROM nvidia/opengl:1.2-glvnd-devel-ubuntu22.04 as nvidia
+FROM nvidia/opengl:1.2-glvnd-devel-ubuntu22.04 AS nvidia
 
 FROM osrf/ros:humble-desktop-full
 

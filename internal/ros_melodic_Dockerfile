@@ -1,4 +1,4 @@
-FROM nvidia/opengl:1.2-glvnd-devel-ubuntu18.04 as nvidia
+FROM nvidia/opengl:1.2-glvnd-devel-ubuntu18.04 AS nvidia
 
 FROM osrf/ros:melodic-desktop-full
 
