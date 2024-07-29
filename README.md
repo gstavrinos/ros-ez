@@ -43,6 +43,7 @@ or
 * [For versions >= `v2.0.1`] Sound integration is now working normally. The bug was introduced in `v2.0.0`.
 * [For versions >= `v2.0.2`] Simplification of the systemd service generation.
 * [For versions >= `v2.1.0`] First attempt to use (runtime) host folders instead of saving them on volumes (for /mnt, /run, /sys).
+* [For versions >= `v2.2.0`] Fixed a bug that surfaced on newer kernels running old distros regarding soft and hard nofile (ulimit).
 
 ## Tested Linux distributions
 * EndeavourOS
