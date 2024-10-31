@@ -66,4 +66,8 @@ TODO
 - [For versions >= `v2.0.2`] Simplification of the systemd service generation.
 - [For versions >= `v2.1.0`] First attempt to use (runtime) host folders instead of saving them on volumes (for /mnt, /run, /sys).
 - [For versions >= `v2.2.0`] Fixed a bug that surfaced on newer kernels running old distros regarding soft and hard nofile (ulimit).
-- [For versions >= `v2.3.0`] The `rosez*` containers are now handled in a more optimised way. This is achieved by running the container once and then using exec to access a shell. This should solve (most of?) the conflicts in packages install/not found on different shells. Also introduced a the `kill-container` or `kc` flag to forcefully kill the `rosez*` container.
+- [For versions >= `v2.3.0`]:
+  - The `rosez*` containers are now handled in a more optimised way. This is achieved by running the container once and then using exec to access a shell. This should solve (most of?) the conflicts in packages install/not found on different shells.
+  - Introduced a the `kill-container` or `kc` flag to forcefully kill the `rosez*` container.
+  - Now sharing `/media` between host and container.
+  - Fixed a bug that occured when the output of the build command was too long.
