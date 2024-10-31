@@ -3,6 +3,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cwd=$(pwd)
 cd $cwd
 source $SCRIPT_DIR/helpers.bash
+get_supported_versions
 now="$(date +'%Y-%m-%d_%H_%M_%S_%N')"
 uptime_date="$(uptime -s | sed "s/[: ]/_/g")"
 # Using uptime_date I can see if a lock file is older
@@ -12,39 +13,21 @@ earliest_possible_read_lock_file="$read_lock_prefix$uptime_date$read_lock_suffix
 earliest_possible_exec_lock_file="$exec_lock_prefix$uptime_date$exec_lock_suffix"
 read_lock_file="$read_lock_prefix$now$read_lock_suffix"
 exec_lock_file="$exec_lock_prefix$now$exec_lock_suffix"
-# TODO: investigate all parameters and how they are affected with exec VS run
-rosws_file="ros2_ws.txt"
-rosez_vol="ros2ez-volume"
-ros="humble"
-ros_image="ros2_ez"
 gpu_string=$(lspci | grep VGA)
 gpu_param=""
 clear_locks=0
 skip_compilation=0
 non_interactive=0
 no_sound=0
-kill_container=0
-lockdir=""
+# lockdir=""
 userid=$(id -u)
-if [ "$1" == "1" ]; then
-  rosws_file="ros_ws.txt"
-  rosez_vol="rosez-volume"
-  ros="noetic"
-  ros_image="ros_ez"
-elif [ "$1" == "3" ]; then
-  rosws_file="rosm_ws.txt"
-  rosez_vol="rosezm-volume"
-  ros="melodic"
-  ros_image="ros_ezm"
-elif [ "$1" == "4" ]; then
-  rosws_file="ros2f_ws.txt"
-  rosez_vol="ros2ezf-volume"
-  ros="foxy"
-  ros_image="ros2_ezf"
-fi
+rosws_file=${workspaces[$($1-1)]}
+rosez_vol="${volumes[$($1-1)]}"
+ros="${distros[$($1-1)]}"
+ros_image="${image_names[$($1-1)]}"
 shift
 trap 'signal_handler' $signal_list
-volumes=""
+rosez_volumes=""
 lockation=""
 while read -r line; do
   wsdir=$(eval echo -e "$line")
@@ -52,7 +35,7 @@ while read -r line; do
     echo "$wsdir not found, creating it"
     mkdir -p $wsdir/src
   fi
-  volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
+  rosez_volumes=$rosez_volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
   if [[ -z "$lockation" ]]; then
     lockation=$wsdir
   fi

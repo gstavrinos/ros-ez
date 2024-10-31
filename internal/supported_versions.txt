@@ -1,5 +1,6 @@
 // command, workspace file, volume, ros distro, image name, executable folder name, dockerfile
 rosez,ros_ws.txt,rosez-volume,noetic,ros_ez,ros-ez,ros_Dockerfile
-ros2ez,ros2_ws.txt,ros2ez-volume,humble,ros2_ez,ros2-ez,ros2_Dockerfile
+ros2ezh,ros2h_ws.txt,ros2ezh-volume,humble,ros2_ezh,ros2-ezh,ros2_humble_Dockerfile
 rosezm,rosm_ws.txt,rosezm-volume,melodic,ros_ezm,ros-ezm,ros_melodic_Dockerfile
 ros2ezf,ros2f_ws.txt,ros2ezf-volume,foxy,ros2_ezf,ros2-ezf,ros2_foxy_Dockerfile
+ros2ezj,ros2j_ws.txt,ros2ezj-volume,jazzy,ros2_ezj,ros2-ezj,ros2_jazzy_Dockerfile
