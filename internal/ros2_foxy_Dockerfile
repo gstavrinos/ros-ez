@@ -10,6 +10,22 @@ FROM osrf/ros:foxy-ros1-bridge
 
 LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
+VOLUME /opt/ros/foxy\
+/bin\
+/etc\
+/home\
+/lib\
+/lib64\
+/mnt\
+/opt\
+/root\
+/run\
+/sbin\
+/srv\
+/sys\
+/usr\
+/var
+
 RUN apt-get update --allow-insecure-repositories && apt-get install -y curl && curl http://repo.ros2.org/repos.key | apt-key add - && apt-get update && apt-get full-upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 git \
 gdb \
@@ -56,20 +72,4 @@ ARG GROUP_ID=16661
 RUN addgroup --gid $GROUP_ID rosez_user && adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
 
 USER rosez_user
-RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update && pip3 install pre-commit
-
-VOLUME /opt/ros/foxy\
-/bin\
-/etc\
-/home\
-/lib\
-/lib64\
-/mnt\
-/opt\
-/root\
-/run\
-/sbin\
-/srv\
-/sys\
-/usr\
-/var
+RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update && pip3 install pre-commit && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
