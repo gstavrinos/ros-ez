@@ -26,7 +26,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       -
-        name: Build and push rosez
+        name: Build and push rosez Noetic
         uses: docker/build-push-action@v3
         with:
           context: .
@@ -34,10 +34,34 @@ jobs:
           push: true
           tags: gstavrinos/rosez:latest
       -
-        name: Build and push ros2ez
+        name: Build and push rosez Melodic
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: "./internal/ros2_Dockerfile"
+          file: "./internal/ros_melodic_Dockerfile"
           push: true
-          tags: gstavrinos/ros2ez:latest
+          tags: gstavrinos/rosezm:latest
+      -
+        name: Build and push ros2ez Humble
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: "./internal/ros2_humble_Dockerfile"
+          push: true
+          tags: gstavrinos/ros2ezh:latest
+      -
+        name: Build and push ros2ez Foxy
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: "./internal/ros2_foxy_Dockerfile"
+          push: true
+          tags: gstavrinos/ros2ezf:latest
+      -
+        name: Build and push ros2ez Jazzy
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: "./internal/ros2_jazzy_Dockerfile"
+          push: true
+          tags: gstavrinos/ros2ezj:latest
