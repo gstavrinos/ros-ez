@@ -1,0 +1,76 @@
+FROM nvidia/opengl:1.2-glvnd-devel-ubuntu24.04 AS nvidia
+
+FROM osrf/ros:jazzy-desktop-full
+
+COPY --from=nvidia /usr/local /usr/local
+
+ENV NVIDIA_VISIBLE_DEVICES=all NVIDIA_DRIVER_CAPABILITIES=all
+
+FROM osrf/ros:jazzy-desktop-full
+
+LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
+
+RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+git \
+gdb \
+vim \
+xterm \
+libgl1 \
+valgrind \
+pre-commit \
+pulseaudio \
+mesa-utils \
+libuvc-dev \
+clang-tidy \
+catkin-lint \
+python3-pip \
+libglx-mesa0 \
+openssh-client \
+clang-format-14 \
+clang-format-18 \
+ros-jazzy-ros-gz \
+python3-catkin-pkg \
+ros-jazzy-navigation2 \
+ros-jazzy-nav2-bringup \
+ros-jazzy-ros2-control \
+ros-jazzy-slam-toolbox \
+ros-jazzy-ros2controlcli \
+ros-jazzy-gz-ros2-control \
+ros-jazzy-control-toolbox \
+ros-jazzy-gz-utils-vendor \
+ros-jazzy-gz-plugin-vendor \
+ros-jazzy-ros2-controllers \
+ros-jazzy-gz-physics-vendor \
+ros-jazzy-rmw-cyclonedds-cpp \
+ros-jazzy-controller-manager \
+ros-jazzy-effort-controllers \
+ros-jazzy-robot-localization \
+ros-jazzy-velocity-controllers \
+ros-jazzy-position-controllers \
+ros-jazzy-joint-state-publisher \
+ros-jazzy-transmission-interface \
+ros-jazzy-joint-state-publisher-gui
+
+ARG USER_ID=16661
+ARG GROUP_ID=16661
+
+RUN getent group $GROUP_ID | cut -d: -f1 | xargs -r groupdel >/dev/null 2>&1 && getent passwd $USER_ID | cut -d: -f1 | xargs -r userdel -r >/dev/null 2>&1 && addgroup --gid $GROUP_ID rosez_user && useradd --create-home --password '' --comment '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
+
+USER rosez_user
+RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update && pip3 install bloom --break-system-packages
+
+VOLUME /opt/ros/jazzy\
+/bin\
+/etc\
+/home\
+/lib\
+/lib64\
+/mnt\
+/opt\
+/root\
+/run\
+/sbin\
+/srv\
+/sys\
+/usr\
+/var

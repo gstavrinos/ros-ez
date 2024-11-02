@@ -3,6 +3,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 cwd=$(pwd)
 cd $cwd
 source $SCRIPT_DIR/helpers.bash
+get_supported_versions
 now="$(date +'%Y-%m-%d_%H_%M_%S_%N')"
 uptime_date="$(uptime -s | sed "s/[: ]/_/g")"
 # Using uptime_date I can see if a lock file is older
@@ -12,11 +13,6 @@ earliest_possible_read_lock_file="$read_lock_prefix$uptime_date$read_lock_suffix
 earliest_possible_exec_lock_file="$exec_lock_prefix$uptime_date$exec_lock_suffix"
 read_lock_file="$read_lock_prefix$now$read_lock_suffix"
 exec_lock_file="$exec_lock_prefix$now$exec_lock_suffix"
-# TODO: investigate all parameters and how they are affected with exec VS run
-rosws_file="ros2_ws.txt"
-rosez_vol="ros2ez-volume"
-ros="humble"
-ros_image="ros2_ez"
 gpu_string=$(lspci | grep VGA)
 gpu_param=""
 clear_locks=0
@@ -24,27 +20,14 @@ skip_compilation=0
 non_interactive=0
 no_sound=0
 kill_container=0
-lockdir=""
 userid=$(id -u)
-if [ "$1" == "1" ]; then
-  rosws_file="ros_ws.txt"
-  rosez_vol="rosez-volume"
-  ros="noetic"
-  ros_image="ros_ez"
-elif [ "$1" == "3" ]; then
-  rosws_file="rosm_ws.txt"
-  rosez_vol="rosezm-volume"
-  ros="melodic"
-  ros_image="ros_ezm"
-elif [ "$1" == "4" ]; then
-  rosws_file="ros2f_ws.txt"
-  rosez_vol="ros2ezf-volume"
-  ros="foxy"
-  ros_image="ros2_ezf"
-fi
+rosws_file=${workspaces[$(($1 - 1))]}
+rosez_vol=${volumes[$(($1 - 1))]}
+ros=${distros[$(($1 - 1))]}
+ros_image=${image_names[$(($1 - 1))]}
 shift
 trap 'signal_handler' $signal_list
-volumes=""
+rosez_volumes=""
 lockation=""
 while read -r line; do
   wsdir=$(eval echo -e "$line")
@@ -52,7 +35,7 @@ while read -r line; do
     echo "$wsdir not found, creating it"
     mkdir -p $wsdir/src
   fi
-  volumes=$volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
+  rosez_volumes=$rosez_volumes"--volume $wsdir:/opt/ros/$(basename $wsdir) "
   if [[ -z "$lockation" ]]; then
     lockation=$wsdir
   fi
@@ -87,10 +70,8 @@ done
 if [ -z "$gpu_param" ]; then
   if grep -q "nvidia" <<<"$gpu_string" || grep -q "Nvidia" <<<"$gpu_string" || grep -q "NVIDIA" <<<"$gpu_string"; then
     gpu_param="--gpus all"
-  elif grep -q "intel" <<<"$gpu_string" || grep -q "Intel" <<<"$gpu_string" || grep -q "INTEL" <<<"$gpu_string"; then
-    gpu_param="--device /dev/dri/card0"
   else
-    echo "No Nvidia or Intel GPU found. This case has not been investigated yet. GUI integration might be broken. (Good luck!)"
+    gpu_param="--device /dev/dri/card0"
   fi
 fi
 if [ $clear_locks -gt 0 ]; then
@@ -101,7 +82,6 @@ if [ $kill_container -gt 0 ]; then
   echo -e "${colour_orange}I was passed the kill-container flag. Killing (and deleting) my container ($ros_image)...$colour_end"
   docker rm -f $ros_image >/dev/null 2>&1
 fi
-echo $gpu_param
 touch $lockation/$read_lock_file
 locked=1
 while [ $locked -gt 0 ]; do
@@ -112,7 +92,6 @@ while [ $locked -gt 0 ]; do
   # ---
   # A new lock_file is created, since the other rosez
   # process will instantly get priority with the cl flag.
-  echo $found_lock
   if [[ -z "$found_lock" ]]; then
     now="$(date +'%Y-%m-%d_%H_%M_%S_%N')"
     read_lock_file="$read_lock_prefix$now$read_lock_suffix"
@@ -158,19 +137,21 @@ touch $xauthf
 intermediate_error_handler $?
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
 intermediate_error_handler $?
-x="docker run --ulimit nofile=1024:524288 --rm $it -u $userid --ipc=host --privileged --network host $gpu_param $sound --group-add dialout --group-add video --group-add audio -v $rosez_vol-bin:/bin -v $rosez_vol-etc:/etc/ -v $rosez_vol-home:/home/ -v $rosez_vol-lib:/lib/ -v $rosez_vol-lib64:/lib64/ -v /media:/media -v /mnt:/mnt -v $rosez_vol-opt:/opt/ -v $rosez_vol-root:/root/ -v /run:/run -v $rosez_vol-sbin:/sbin/ -v $rosez_vol-srv:/srv/ -v $rosez_vol-usr:/usr -v $rosez_vol-var:/var -v $rosez_vol:/opt/ros/$ros -v $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes -v $SCRIPT_DIR/entrypoint.bash:/home/rosez_user/.bashrc -v /sys:/sys -v /proc:/proc -v /dev:/dev -v $bloom_file:/home/rosez_user/.config/bloom -v $gitconfig_file:/home/rosez_user/.gitconfig -v $ssh_folder:/home/rosez_user/.ssh -v $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt -v $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -v /:$HOME/.$rosez_vol -e DISPLAY -e TERM -e QT_X11_NO_MITSHM=1 -e XAUTHORITY=$xauthf -v $xauthf:$xauthf -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro $ros_image:latest"
 container_id=$(docker ps -q --filter "name=$ros_image")
 found_lock="$(find $lockation -maxdepth 1 -name "$exec_lock_prefix*$exec_lock_suffix" -print | sort | head -1)"
 fl="$(basename "$found_lock")"
 if [[ -z "$container_id" || "$fl" < "$earliest_possible_exec_lock_file" ]]; then
   docker rm -f $ros_image >/dev/null 2>&1
   intermediate_error_handler $?
-  x="docker run --name $ros_image --ulimit nofile=1024:524288 -d -u $userid --ipc=host --privileged --network host $gpu_param $sound --group-add dialout --group-add video --group-add audio -v $rosez_vol-bin:/bin -v $rosez_vol-etc:/etc/ -v $rosez_vol-home:/home/ -v $rosez_vol-lib:/lib/ -v $rosez_vol-lib64:/lib64/ -v /media:/media -v /mnt:/mnt -v $rosez_vol-opt:/opt/ -v $rosez_vol-root:/root/ -v /run:/run -v $rosez_vol-sbin:/sbin/ -v $rosez_vol-srv:/srv/ -v $rosez_vol-usr:/usr -v $rosez_vol-var:/var -v $rosez_vol:/opt/ros/$ros -v $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $volumes -v $SCRIPT_DIR/entrypoint.bash:/home/rosez_user/.bashrc -v /sys:/sys -v /dev:/dev -v $bloom_file:/home/rosez_user/.config/bloom -v $gitconfig_file:/home/rosez_user/.gitconfig -v $ssh_folder:/home/rosez_user/.ssh -v $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt -v $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -v /:$HOME/.$rosez_vol -e DISPLAY -e TERM -e QT_X11_NO_MITSHM=1 -e XAUTHORITY=$xauthf -v $xauthf:$xauthf -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro $ros_image:latest tail -f /dev/null"
+  x="docker run --name $ros_image --ulimit nofile=1024:524288 -d -u $userid --ipc=host --privileged --network host $gpu_param $sound --group-add dialout --group-add video --group-add audio -v $rosez_vol-bin:/bin -v $rosez_vol-etc:/etc/ -v $rosez_vol-home:/home/ -v $rosez_vol-lib:/lib/ -v $rosez_vol-lib64:/lib64/ -v /media:/media -v /mnt:/mnt -v $rosez_vol-opt:/opt/ -v $rosez_vol-root:/root/ -v /run:/run -v $rosez_vol-sbin:/sbin/ -v $rosez_vol-srv:/srv/ -v $rosez_vol-usr:/usr -v $rosez_vol-var:/var -v $rosez_vol:/opt/ros/$ros -v $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $rosez_volumes -v $SCRIPT_DIR/entrypoint.bash:/home/rosez_user/.bashrc -v /sys:/sys -v /dev:/dev -v $bloom_file:/home/rosez_user/.config/bloom -v $gitconfig_file:/home/rosez_user/.gitconfig -v $ssh_folder:/home/rosez_user/.ssh -v $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt -v $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -v /:$HOME/.$rosez_vol -e DISPLAY -e TERM -e QT_X11_NO_MITSHM=1 -e XAUTHORITY=$xauthf -v $xauthf:$xauthf -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro $ros_image:latest tail -f /dev/null"
   intermediate_error_handler $?
   echo -e "${colour_blue}$ros_image daemon not found.${colour_end}\nExecuting:\n---\n$x\n---"
   eval "$x"
   container_id=$(docker ps -q --filter "name=$ros_image")
   intermediate_error_handler $?
+fi
+if [[ -z "$container_id" ]]; then
+  intermediate_error_handler 1
 fi
 x="docker exec $it $container_id"
 intermediate_error_handler $?

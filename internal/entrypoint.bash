@@ -24,7 +24,7 @@ trap 'signal_handler' $signal_list
 if [ "$rosversion" != "unknown" ]; then
   # sudo touch $lockation/$lock_file
   . /opt/ros/$rosversion/setup.bash
-  if [ "$rosversion" == "humble" ] || [ "$rosversion" == "foxy" ]; then
+  if [ "$rosversion" == "humble" ] || [ "$rosversion" == "foxy" ] || [ "$rosversion" == "jazzy" ]; then
     export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
   fi
   while read -r line; do
@@ -40,7 +40,7 @@ if [ "$rosversion" != "unknown" ]; then
       script --flush --quiet --return /tmp/rosez-build-output.txt --command "rosdep install -ir --from-path src --rosdistro $rosversion -y" | tee /dev/fd/2
       intermediate_error_handler $?
     fi
-    if [ "$rosversion" == "humble" ] || [ "$rosversion" == "foxy" ]; then
+    if [ "$rosversion" == "humble" ] || [ "$rosversion" == "foxy" ] || [ "$rosversion" == "jazzy" ]; then
       if [ $skip_compilation -ne 1 ]; then
         script --flush --quiet --return /tmp/rosez-build-output.txt --command "colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo" | tee /dev/fd/2
         intermediate_error_handler $?
@@ -59,7 +59,9 @@ if [ "$rosversion" != "unknown" ]; then
   if [ "$rosversion" == "melodic" ]; then
     . /usr/share/gazebo/setup.sh
   else
-    . /usr/share/gazebo/setup.bash
+    if [ "$rosversion" != "jazzy" ]; then
+      . /usr/share/gazebo/setup.bash
+    fi
   fi
   intermediate_error_handler $?
   echo -e "${colour_green}Unlocking my lock file ($lock_file) for other processes...$colour_end"
