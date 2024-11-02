@@ -71,4 +71,6 @@ TODO
   - Introduced a the `kill-container` or `kc` flag to forcefully kill the `rosez*` container.
   - Now sharing `/media` between host and container.
   - Fixed a bug that occured when the output of the build command was too long.
-- [For versions >= `v2.4.0`] Added support for ROS2 Jazzy. **NOTE**: The `ros2ez` command has now been disabled, since currently two ROS2 LTS versions are supported. ROS2 Humble can now been used with the `ros2ezh` command, following the typical `rosez*`/`ros2ez*` scheme. **WARNING**: This versions breaks humble installations. In order to migrate, your best bet is to rename `ros2ez-volume*` volumes to their equivalent `ros2ezh-volume*`.
+  - Accidentally, a new bug for ROS1 was introduced in this release. It is fixed in `v2.5.0`.
+- [For versions >= `v2.4.0`] Added support for ROS2 Jazzy. **NOTE**: The `ros2ez` command has now been disabled, since currently two ROS2 LTS versions are supported. ROS2 Humble can now been used with the `ros2ezh` command, following the typical `rosez*`/`ros2ez*` scheme. **WARNING**: This versions breaks humble installations. In order to migrate, your best bet is to rename `ros2ez-volume*` volumes to their equivalent `ros2ezh-volume*`. Accidentally, a new bug for ROS1 was introduced in this release. It is fixed in `v2.5.0`.
+- [For versions >= `v2.5.0`] Added rust support for all ROS distributions. Also, fixed bug #79 that was introduced in `v2.3.0`.
