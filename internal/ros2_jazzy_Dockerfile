@@ -10,10 +10,27 @@ FROM osrf/ros:jazzy-desktop-full
 
 LABEL maintainer="George Stavrinos <gstavrinos@protonmail.com>"
 
+VOLUME /opt/ros/jazzy\
+/bin\
+/etc\
+/home\
+/lib\
+/lib64\
+/mnt\
+/opt\
+/root\
+/run\
+/sbin\
+/srv\
+/sys\
+/usr\
+/var
+
 RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 git \
 gdb \
 vim \
+curl \
 xterm \
 libgl1 \
 valgrind \
@@ -57,20 +74,4 @@ ARG GROUP_ID=16661
 RUN getent group $GROUP_ID | cut -d: -f1 | xargs -r groupdel >/dev/null 2>&1 && getent passwd $USER_ID | cut -d: -f1 | xargs -r userdel -r >/dev/null 2>&1 && addgroup --gid $GROUP_ID rosez_user && useradd --create-home --password '' --comment '' --uid $USER_ID --gid $GROUP_ID rosez_user && usermod -aG sudo rosez_user && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && touch /home/rosez_user/.sudo_as_admin_successful
 
 USER rosez_user
-RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update && pip3 install bloom --break-system-packages
-
-VOLUME /opt/ros/jazzy\
-/bin\
-/etc\
-/home\
-/lib\
-/lib64\
-/mnt\
-/opt\
-/root\
-/run\
-/sbin\
-/srv\
-/sys\
-/usr\
-/var
+RUN sudo chown -R rosez_user:rosez_user /home/rosez_user && rosdep update && pip3 install -U bloom --break-system-packages && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

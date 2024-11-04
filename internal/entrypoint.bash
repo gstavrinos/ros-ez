@@ -49,7 +49,7 @@ if [ "$rosversion" != "unknown" ]; then
       intermediate_error_handler $?
     else
       if [ $skip_compilation -ne 1 ]; then
-        script --flush --quiet --return /tmp/rosez-build-output.txt --command "catkin_make"
+        script --flush --quiet --return /tmp/rosez-build-output.txt --command "catkin_make" | tee /dev/fd/2
         intermediate_error_handler $?
       fi
       . /opt/ros/$bl/devel/setup.bash
@@ -69,4 +69,5 @@ if [ "$rosversion" != "unknown" ]; then
   exec "$@"
   trap - $signal_list
 fi
-# . "$HOME/.cargo/env"
+export PATH=/home/rosez_user/.local/bin:$PATH
+. "$HOME/.cargo/env"
