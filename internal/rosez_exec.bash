@@ -101,12 +101,16 @@ while [ $locked -gt 0 ]; do
   fl="$(basename $found_lock)"
   echo -e "${colour_blue}Processing: $fl$colour_end"
   if [[ "$fl" < "$earliest_possible_read_lock_file" ]]; then
-    echo -e "${colour_orange}Found problematic lock file ($fl)! Deleting it... (Lock file older than uptime)$colour_end"
-    rm $found_lock
-  elif [ "$fl" \< "$read_lock_file" ]; then
+    while [[ "$fl" < "$earliest_possible_read_lock_file" ]]; do
+      echo -e "${colour_orange}Found problematic lock file ($fl)! Deleting it... (Lock file older than uptime)$colour_end"
+      rm $found_lock
+      found_lock="$(find $lockation -maxdepth 1 -name "$read_lock_prefix*$read_lock_suffix" -print | sort | head -1)"
+      fl="$(basename $found_lock)"
+    done
+  elif [[ "$fl" < "$read_lock_file" ]]; then
     echo -e "${colour_orange}Found earlier lock file ($fl) than my own ($read_lock_file)!\nWaiting...$colour_end"
     sleep 3
-  elif [ "$fl" == "$read_lock_file" ]; then
+  elif [[ "$fl" == "$read_lock_file" ]]; then
     echo -e "${colour_green}My lock file ($read_lock_file) is the earliest found. Continuing...$colour_end"
     locked=0
   fi
@@ -140,7 +144,13 @@ intermediate_error_handler $?
 container_id=$(docker ps -q --filter "name=$ros_image")
 found_lock="$(find $lockation -maxdepth 1 -name "$exec_lock_prefix*$exec_lock_suffix" -print | sort | head -1)"
 fl="$(basename "$found_lock")"
-if [[ -z "$container_id" || "$fl" < "$earliest_possible_exec_lock_file" ]]; then
+while [[ -n "$fl" && "$fl" < "$earliest_possible_exec_lock_file" ]]; do
+  echo -e "${colour_orange}Found problematic exec lock file ($fl)! Deleting it... (Lock file older than uptime)$colour_end"
+  rm $found_lock
+  found_lock="$(find $lockation -maxdepth 1 -name "$exec_lock_prefix*$exec_lock_suffix" -print | sort | head -1)"
+  fl="$(basename "$found_lock")"
+done
+if [[ -z "$container_id" ]]; then
   docker rm -f $ros_image >/dev/null 2>&1
   intermediate_error_handler $?
   x="docker run --name $ros_image --ulimit nofile=1024:524288 -d -u $userid --ipc=host --privileged --network host $gpu_param $sound --group-add dialout --group-add video --group-add audio -v $rosez_vol-bin:/bin -v $rosez_vol-etc:/etc/ -v $rosez_vol-home:/home/ -v $rosez_vol-lib:/lib/ -v $rosez_vol-lib64:/lib64/ -v /media:/media -v /mnt:/mnt -v $rosez_vol-opt:/opt/ -v $rosez_vol-root:/root/ -v /run:/run -v $rosez_vol-sbin:/sbin/ -v $rosez_vol-srv:/srv/ -v $rosez_vol-usr:/usr -v $rosez_vol-var:/var -v $rosez_vol:/opt/ros/$ros -v $SCRIPT_DIR/../includes/$rosws_file:/opt/ros/$rosws_file $rosez_volumes -v $SCRIPT_DIR/entrypoint.bash:/home/rosez_user/.bashrc -v /sys:/sys -v /dev:/dev -v $bloom_file:/home/rosez_user/.config/bloom -v $gitconfig_file:/home/rosez_user/.gitconfig -v $ssh_folder:/home/rosez_user/.ssh -v $SCRIPT_DIR/supported_versions.txt:/home/rosez_user/supported_versions.txt -v $SCRIPT_DIR/helpers.bash:/home/rosez_user/helpers.bash -v /:$HOME/.$rosez_vol -e DISPLAY -e TERM -e QT_X11_NO_MITSHM=1 -e XAUTHORITY=$xauthf -v $xauthf:$xauthf -v /tmp/.X11-unix:/tmp/.X11-unix -v /etc/localtime:/etc/localtime:ro $ros_image:latest tail -f /dev/null"
