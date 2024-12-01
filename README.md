@@ -75,3 +75,4 @@ TODO
 - [For versions >= `v2.4.0`] Added support for ROS2 Jazzy. **NOTE**: The `ros2ez` command has now been disabled, since currently two ROS2 LTS versions are supported. ROS2 Humble can now been used with the `ros2ezh` command, following the typical `rosez*`/`ros2ez*` scheme. **WARNING**: This versions breaks humble installations. In order to migrate, your best bet is to rename `ros2ez-volume*` volumes to their equivalent `ros2ezh-volume*`. Accidentally, a new bug for ROS1 was introduced in this release. It is fixed in `v2.5.0`.
 - [For versions >= `v2.5.0`] Added rust support for all ROS distributions. Also, fixed bug #79 that was introduced in `v2.3.0`.
 - [For versions >= `v2.5.1`] Now deleting all problematic locks instead of just the oldest and fixed #85 (exec locks daemon bug).
+- [For versions >= `v2.5.2`] Fixed a bug that was introduced in `v2.4.0` where `rosez` and `rosezm` could get mixed up when used simultaneously (issue #88).

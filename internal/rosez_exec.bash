@@ -141,7 +141,7 @@ touch $xauthf
 intermediate_error_handler $?
 /bin/bash -c "xauth nlist $DISPLAY | sed -e 's/^..../ffff/' | xauth -f $xauthf nmerge -"
 intermediate_error_handler $?
-container_id=$(docker ps -q --filter "name=$ros_image")
+container_id=$(docker ps | grep -w "$ros_image" | awk '{print $1}')
 found_lock="$(find $lockation -maxdepth 1 -name "$exec_lock_prefix*$exec_lock_suffix" -print | sort | head -1)"
 fl="$(basename "$found_lock")"
 while [[ -n "$fl" && "$fl" < "$earliest_possible_exec_lock_file" ]]; do
@@ -157,7 +157,7 @@ if [[ -z "$container_id" ]]; then
   intermediate_error_handler $?
   echo -e "${colour_blue}$ros_image daemon not found.${colour_end}\nExecuting:\n---\n$x\n---"
   eval "$x"
-  container_id=$(docker ps -q --filter "name=$ros_image")
+  container_id=$(docker ps | grep -w "$ros_image" | awk '{print $1}')
   intermediate_error_handler $?
 fi
 if [[ -z "$container_id" ]]; then
