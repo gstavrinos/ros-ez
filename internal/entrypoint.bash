@@ -49,10 +49,26 @@ if [ "$rosversion" != "unknown" ]; then
       intermediate_error_handler $?
     else
       if [ $skip_compilation -ne 1 ]; then
-        script --flush --quiet --return /tmp/rosez-build-output.txt --command "catkin_make" | tee /dev/fd/2
+        catkin_tool="catkin_make"
+        cmake_extras="--cmake-args -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+        built_by_file=/opt/ros/"$bl"/build/.built_by
+        if [[ -f "$built_by_file" ]]; then
+          built_by=$(cat $built_by_file)
+          if [[ "$built_by" == "catkin_make" || "$built_by" == "catkin build" ]]; then
+            catkin_tool="$built_by"
+          else
+            echo -e "${colour_orange}${bl}: No catkin tool (catkin_make/catkin build) could be detected. Defaulting to catkin_make...$colour_end"
+          fi
+        fi
+        script --flush --quiet --return /tmp/rosez-build-output.txt --command "$catkin_tool $cmake_extras" | tee /dev/fd/2
         intermediate_error_handler $?
       fi
-      . /opt/ros/$bl/devel/setup.bash
+      devel_setup_file="/opt/ros/$bl/devel/setup.bash"
+      if [[ -f "$devel_setup_file" ]]; then
+        . "$devel_setup_file"
+      else
+        echo -e "${colour_orange}${bl}: No setup.bash file was found under devel. Continuing without sourcing the workspace...$colour_end"
+      fi
       intermediate_error_handler $?
     fi
   done </opt/ros/$wstxt
