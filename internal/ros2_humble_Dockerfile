@@ -30,6 +30,7 @@ RUN mkdir -p /opt/ros/ros2_ws/src && apt-get update && apt-get full-upgrade -y &
 git \
 gdb \
 vim \
+wget \
 curl \
 xterm \
 valgrind \

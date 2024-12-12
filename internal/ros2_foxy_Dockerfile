@@ -30,6 +30,8 @@ RUN apt-get update --allow-insecure-repositories && apt-get install -y curl && c
 git \
 gdb \
 vim \
+wget \
+curl \
 xterm \
 valgrind \
 pulseaudio \

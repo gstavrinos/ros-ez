@@ -28,6 +28,7 @@ RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y
 git \
 gdb \
 vim \
+wget \
 curl \
 xterm \
 valgrind \
@@ -45,6 +46,7 @@ ros-melodic-amcl \
 python-catkin-pkg \
 python-catkin-lint \
 ros-melodic-moveit \
+python-catkin-tools \
 ros-melodic-move-base \
 ros-melodic-navigation \
 ros-melodic-gazebo-ros \
