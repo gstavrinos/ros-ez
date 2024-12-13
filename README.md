@@ -76,3 +76,4 @@ TODO
 - [For versions >= `v2.5.0`] Added rust support for all ROS distributions. Also, fixed bug #79 that was introduced in `v2.3.0`.
 - [For versions >= `v2.5.1`] Now deleting all problematic locks instead of just the oldest and fixed #85 (exec locks daemon bug).
 - [For versions >= `v2.5.2`] Fixed a bug that was introduced in `v2.4.0` where `rosez` and `rosezm` could get mixed up when used simultaneously (issue #88).
+- [For versions >= `v2.5.3`] Added the ability to distinguish between `catkin_make` and `catkin build` workspaces in ROS1. Also, now using the `RelWithDebInfo` flag for all build commands.

@@ -30,6 +30,7 @@ RUN mkdir -p /opt/ros/catkin_ws/src && apt-get update && apt-get full-upgrade -y
 git \
 gdb \
 vim \
+wget \
 curl \
 xterm \
 valgrind \
@@ -47,6 +48,7 @@ libgl1-mesa-glx \
 ros-noetic-amcl \
 ros-noetic-moveit \
 python3-catkin-pkg \
+python3-catkin-tools \
 ros-noetic-move-base \
 ros-noetic-navigation \
 ros-noetic-gazebo-ros \
